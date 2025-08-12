@@ -1,0 +1,6 @@
+{
+  "test-import": [
+    "moonbitlang/formatter/fmt",
+    "moonbitlang/x/fs"
+  ]
+}

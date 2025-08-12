@@ -1,0 +1,15 @@
+{
+  "import": [
+    "moonbitlang/parser/syntax",
+    "moonbitlang/parser/basic",
+    "moonbitlang/parser/tokens",
+    {
+      "path": "Yoorkin/prettyprinter",
+      "alias": "pp"
+    },
+    "moonbitlang/parser/lexer",
+    "moonbitlang/parser/handrolled_parser",
+    "moonbitlang/formatter/comment",
+    "moonbitlang/parser/attribute"
+  ]
+}

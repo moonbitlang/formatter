@@ -1,0 +1,79 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/formatter/comment"
+
+import(
+  "moonbitlang/core/list"
+  "moonbitlang/parser/basic"
+  "moonbitlang/parser/syntax"
+  "moonbitlang/parser/tokens"
+)
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Comment {
+  start : @basic.Position
+  end : @basic.Position
+  left : (@tokens.Token, @basic.Position, @basic.Position)?
+  right : (@tokens.Token, @basic.Position, @basic.Position)?
+  kind : CommentKind
+}
+impl @Yoorkin/prettyprinter.Pretty for Comment
+impl Show for Comment
+
+pub(all) enum CommentKind {
+  Blank
+  Block(String)
+  Line(String)
+}
+impl @Yoorkin/prettyprinter.Pretty for CommentKind
+impl Show for CommentKind
+
+pub(all) enum Key {
+  Token(@basic.Location)
+  Node(@basic.Location)
+}
+fn Key::loc(Self) -> @basic.Location
+impl @Yoorkin/prettyprinter.Pretty for Key
+impl Compare for Key
+impl Eq for Key
+impl Hash for Key
+
+type Mapper
+fn Mapper::consume_comments(Self, Key?, (Comment) -> Bool) -> Array[Comment]
+fn Mapper::get_table(Self, @basic.Location) -> NodeTable
+fn Mapper::has_comment(Self, Key?) -> Bool
+fn Mapper::has_leading_comment(Self, Key?) -> Bool
+fn Mapper::has_trailing_comment(Self, Key?) -> Bool
+fn Mapper::new(Array[(@tokens.Token, @basic.Position, @basic.Position)], @list.List[@syntax.Impl]) -> Self
+fn Mapper::to_debug_info(Self) -> String
+
+type NodeArray
+fn NodeArray::empty() -> Self
+fn NodeArray::last(Self) -> Key?
+fn NodeArray::op_get(Self, Int) -> Key?
+impl @Yoorkin/prettyprinter.Pretty for NodeArray
+
+type NodeTable
+fn NodeTable::empty() -> Self
+fn NodeTable::get_array(Self, String) -> NodeArray
+fn NodeTable::get_table(Self, String) -> Self
+fn NodeTable::get_table_array(Self, String) -> NodeTableArray
+fn NodeTable::get_token(Self, String) -> Key?
+fn NodeTable::new(Map[String, TokenGroup]) -> Self
+impl @Yoorkin/prettyprinter.Pretty for NodeTable
+
+type NodeTableArray
+fn NodeTableArray::empty() -> Self
+fn NodeTableArray::op_get(Self, Int) -> NodeTable
+impl @Yoorkin/prettyprinter.Pretty for NodeTableArray
+
+type TokenGroup
+impl @Yoorkin/prettyprinter.Pretty for TokenGroup
+
+// Type aliases
+
+// Traits
+
