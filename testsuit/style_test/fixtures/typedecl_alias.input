@@ -1,0 +1,2 @@
+typealias (Int, Bool) as IntBoolPair
+

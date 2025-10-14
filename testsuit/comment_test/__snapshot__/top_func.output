@@ -1,12 +1,12 @@
  // 0
-pub //1 
+pub //1  
 async //2
  //2a
 fn[ //2b
   T, //2c
   R //2d  
-  : //2e 
-  ShowCompare, //2g
+  : //2e  
+  Show + Compare, //2g
    //3 
 ] f( //3a
   p1 : T1, //4

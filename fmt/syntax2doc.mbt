@@ -117,14 +117,33 @@ fn Fmt::impls(fmt : Self, impls : List[@syntax.Impl]) -> Doc {
 }
 
 ///|
+fn Fmt::return_and_error_type_annotation(
+  fmt : Self,
+  return_ty : @syntax.Type?,
+  err_ty : @syntax.ErrorType,
+) -> Doc {
+  let arrow = if return_ty is None && err_ty is NoErrorType {
+    empty
+  } else {
+    space + text("->")
+  }
+  let return_type = match return_ty {
+    None => empty
+    Some(ty) => space + fmt.ty(ty)
+  }
+  let error_type = fmt.error_type(err_ty)
+  arrow + return_type + error_type
+}
+
+///|
 fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
   match toplevel {
-    TopView(_) => panic() //TODO
+    TopView(_) => abort("enumview is not supported yet.")
     TopImpl(
       self_ty~,
       trait_~,
       method_name~,
-      has_error~,
+      has_error=_,
       quantifiers~,
       params~,
       ret_ty~,
@@ -133,15 +152,70 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       vis~,
       attrs~,
       doc~,
-      loc=_
+      loc~
     ) => {
-      ignore(
-        (
-          self_ty, trait_, method_name, has_error, quantifiers, params, ret_ty, err_ty,
-          body, vis, attrs, doc,
+      let doc = fmt.docstring(doc)
+      let attrs = fmt.attributes(attrs)
+      let vis = fmt.visibility(vis)
+      let impl_ = text("impl")
+      let quantifiers = fmt.type_var_binders(
+        quantifiers,
+        lbracket=None,
+        commas=@comment.NodeArray::empty(),
+        tvar_tables=@comment.NodeTableArray::empty(),
+        rbracket=None,
+      )
+      let trait_ = fmt.type_name(trait_)
+      let for_part = match self_ty {
+        None => empty
+        Some(ty) => space + text("for") + space + fmt.ty(ty)
+      }
+      let with_ = space + text("with")
+      let method_name = space + text(method_name.name)
+      let params = group(
+        fmt.parameters(
+          params,
+          lparen=None,
+          param_tables=@comment.NodeTableArray::empty(),
+          commas=@comment.NodeArray::empty(),
+          rparen=None,
         ),
       )
-      panic()
+      let result = fmt.return_and_error_type_annotation(ret_ty, err_ty)
+      let body = match body {
+        DeclBody(local_types~, expr~) =>
+          space + fmt.expr_block(expr, local_types~, force_newline=true)
+        DeclStubs(stubs) => {
+          let stubs = match stubs {
+            Import(module_name~, func_name~) => {
+              let module_name = double_quoted(text(module_name))
+              let func_name = double_quoted(text(func_name))
+              space + module_name + space + func_name
+            }
+            Embedded(language~, code~) => {
+              guard language is None else {
+                abort("language must be None in impl stub.")
+              }
+              let code = fmt.embedded_code(code)
+              space + code
+            }
+          }
+          space + text("=") + stubs
+        }
+      }
+      doc +
+      attrs +
+      vis +
+      impl_ +
+      quantifiers +
+      space +
+      trait_ +
+      for_part +
+      with_ +
+      method_name +
+      params +
+      result +
+      body
     }
     TopTrait({ name, supers, methods, vis, attrs, doc, loc: _ }) => {
       let doc = fmt.docstring(doc)
@@ -154,16 +228,22 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         More(_) =>
           space +
           colon +
-          space +
-          series1(
-            supers.map(x => fmt.type_var_constraint(x)),
-            space + char('+'),
+          group(
+            nest(
+              line +
+              series1(
+                supers.map(x => fmt.type_var_constraint(x)),
+                space + char('+'),
+                trailing=AlwaysHidden,
+              ),
+            ),
           )
       }
-      let methods = braces(
-        series1(methods.map(x => fmt.trait_method(x)), empty),
-        force_newline=true,
-      )
+      let methods = space +
+        braces(
+          series1(methods.map(x => fmt.trait_method(x)), empty),
+          force_newline=true,
+        )
       doc + attrs + vis + trait_ + name + supers + methods
     }
     TopLetDef(binder~, ty~, expr~, vis~, is_constant~, attrs~, doc~, loc=_) => {
@@ -230,12 +310,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
             ),
           )
       }
-      let arrow = space + text("->")
-      let return_type = match return_type {
-        None => empty
-        Some(ty) => space + fmt.ty(ty)
-      }
-      let error_type = fmt.error_type(error_type)
+      let result = fmt.return_and_error_type_annotation(return_type, error_type)
       let (extern_, body) = match decl_body {
         DeclBody(local_types~, expr~) =>
           (empty, space + fmt.expr_block(expr, local_types~))
@@ -267,9 +342,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         type_name +
         binder +
         params +
-        arrow +
-        return_type +
-        error_type +
+        result +
         body
       fmt.wrap_comment(Some(Node(loc)), layout)
     }
@@ -319,7 +392,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       let self = space + fmt.ty(self_ty)
       let for_ = space + text("for")
       let trait_ = space + fmt.type_name(trait_)
-      doc + attrs + vis + impl_ + quantifiers + self + for_ + trait_
+      doc + attrs + vis + impl_ + quantifiers + trait_ + for_ + self
     }
     TopBatchTraitAlias(pkg~, targets~, vis~, attrs~, is_list=_, doc~, loc=_) => {
       let doc = fmt.docstring(doc)
@@ -431,9 +504,9 @@ fn Fmt::type_var_binder(
         let plus = if i == 0 {
           empty
         } else {
-          env.wrap_comment(pluses[i], empty)
+          env.wrap_comment(pluses[i], space + text("+"))
         }
-        let constraint = env.type_var_constraint(constraint)
+        let constraint = space + env.type_var_constraint(constraint)
         traits = traits + plus + constraint
       }
       colon + traits
@@ -480,19 +553,51 @@ fn Fmt::type_var_binders(
   let rp = char(']')
   let (before_l, after_l) = fmt.comments(lbracket)
   let (before_r, after_r) = fmt.comments(rbracket)
-  before_l +
-  lp +
-  nest(after_l + softline + acc + before_r) +
-  softline +
-  rp +
-  after_r
+  group(
+    before_l +
+    lp +
+    nest(after_l + softline + acc + before_r) +
+    softline +
+    rp +
+    after_r,
+  )
 }
 
 ///|
 fn Fmt::trait_method(fmt : Fmt, meth : @syntax.TraitMethodDecl) -> Doc {
-  // TODO
-  ignore((fmt, meth))
-  panic()
+  let {
+    name,
+    has_error: _,
+    is_async,
+    quantifiers: _,
+    params,
+    return_type,
+    error_type,
+    loc,
+    has_default,
+    attrs,
+  } = meth
+  let async_ = if is_async { text("async") + space } else { empty }
+  let name = text(name.name)
+  let params = fmt.parameters(
+    is_trait_method=true,
+    params,
+    lparen=None,
+    rparen=None,
+    commas=@comment.NodeArray::empty(),
+    param_tables=@comment.NodeTableArray::empty(),
+  )
+  let arrow = space + text("->")
+  let return_type = match return_type {
+    None => empty
+    Some(ty) => space + fmt.ty(ty)
+  }
+  let error_type = fmt.error_type(error_type)
+  let has_default = match has_default {
+    None => empty
+    Some(loc) => space + char('=') + space + text("_")
+  }
+  group(async_ + name + params + arrow + return_type + error_type + has_default)
 }
 
 ///|
@@ -510,12 +615,12 @@ fn Fmt::visibility(fmt : Fmt, vis : @syntax.Visibility) -> Doc {
           lparen + id + rparen
         }
       }
-      fmt.wrap_comment(Some(Node(loc)), pub_ + modifier)
+      fmt.wrap_comment(Some(Node(loc)), pub_ + modifier) + space
     }
     Priv(loc~) => {
       let table = fmt.get_table(loc)
       let priv_ = fmt.wrap_comment(table.get_token("priv"), text("priv"))
-      fmt.wrap_comment(Some(Node(loc)), priv_ + space)
+      fmt.wrap_comment(Some(Node(loc)), priv_) + space
     }
     Default => empty
   }
@@ -534,20 +639,198 @@ fn Fmt::docstring(fmt : Fmt, doc : @syntax.DocString) -> Doc {
 }
 
 ///|
+fn Fmt::type_decl_binder(fmt : Self, binder : @syntax.TypeDeclBinder) -> Doc {
+  let { name, loc } = binder
+  match name {
+    None => text("_")
+    Some(n) => text(n)
+  }
+}
+
+///|
+fn Fmt::type_decl_binders(
+  fmt : Self,
+  binders : List[@syntax.TypeDeclBinder],
+) -> Doc {
+  match binders {
+    Empty => empty
+    More(_) =>
+      group(brackets(series1(binders.map(x => fmt.type_decl_binder(x)), comma)))
+  }
+}
+
+///|
+fn Fmt::constr_param(fmt : Self, constr_param : @syntax.ConstrParam) -> Doc {
+  let { mut_, label, ty } = constr_param
+  let mut_ = if mut_ { text("mut") + space } else { empty }
+  let label = match label {
+    None => empty
+    Some(label) => fmt.label(label) + char('~') + space + char(':') + space
+  }
+  let ty = fmt.ty(ty)
+  mut_ + label + ty
+}
+
+///|
+fn Fmt::constr_decl(fmt : Self, constr_decl : @syntax.ConstrDecl) -> Doc {
+  let { name, args, tag, loc, attrs, doc } = constr_decl
+  let doc = fmt.docstring(doc)
+  let attrs = fmt.attributes(attrs)
+  let name = text(name.name)
+  let args = match args {
+    None => empty
+    Some(xs) => group(parens(series1(xs.map(x => fmt.constr_param(x)), comma)))
+  }
+  let tag = match tag {
+    None => empty
+    Some((tag, loc)) => space + char('=') + space + text(tag)
+  }
+  doc + attrs + name + args + tag
+}
+
+///|
+fn Fmt::deriving_directive(
+  fmt : Self,
+  deriving : @syntax.DerivingDirective,
+) -> Doc {
+  let { type_name, args, loc } = deriving
+  let type_name = fmt.type_name(type_name)
+  let args = match args {
+    Empty => empty
+    More(_) => parens(series1(args.map(x => fmt.argument(x)), comma))
+  }
+  type_name + args
+}
+
+///|
+fn Fmt::deriving_directives(
+  fmt : Self,
+  deriving : List[@syntax.DerivingDirective],
+) -> Doc {
+  match deriving {
+    Empty => empty
+    More(_) => {
+      let derive_ = text("derive")
+      let xs = group(
+        parens(series1(deriving.map(x => fmt.deriving_directive(x)), comma)),
+      )
+      space + derive_ + xs
+    }
+  }
+}
+
+///|
+fn Fmt::field_decl(fmt : Self, field_decl : @syntax.FieldDecl) -> Doc {
+  let { name, ty, mut_, vis, attrs, doc, loc } = field_decl
+  let doc = fmt.docstring(doc)
+  let attrs = fmt.attributes(attrs)
+  let vis = fmt.visibility(vis)
+  let mut_ = if mut_ { text("mut") + space } else { empty }
+  let name = text(name.label)
+  let ty = fmt.ty(ty)
+  doc + attrs + vis + mut_ + name + space + char(':') + space + ty
+}
+
+///|
 fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
   ignore(fmt) //TODO: use fmt to access comments
   let {
-    tycon: _,
+    tycon,
     tycon_loc: _,
-    params: _,
-    components: _,
-    attrs: _,
-    doc: _,
-    type_vis: _,
-    deriving: _,
+    params,
+    components,
+    attrs,
+    doc,
+    type_vis,
+    deriving,
     loc: _,
   } = typedecl
-  panic()
+  let doc = fmt.docstring(doc)
+  let attrs = fmt.attributes(attrs)
+  let vis = fmt.visibility(type_vis)
+  let semi = switch(char(';'), empty)
+  match components {
+    Variant(constr_decls) => {
+      let enum_ = text("enum")
+      let tycon = space + text(tycon)
+      let params = fmt.type_decl_binders(params)
+      let lbrace = space + char('{')
+      let constrs = nest(
+        hardline + series1(constr_decls.map(x => fmt.constr_decl(x)), semi),
+      )
+      let rbrace = hardline + char('}')
+      let deriving = fmt.deriving_directives(deriving)
+      doc +
+      attrs +
+      vis +
+      enum_ +
+      tycon +
+      params +
+      lbrace +
+      constrs +
+      rbrace +
+      deriving
+    }
+    Record(field_decls) => {
+      let struct_ = text("struct")
+      let tycon = space + text(tycon)
+      let params = fmt.type_decl_binders(params)
+      let lbrace = space + char('{')
+      let semi = switch(char(';'), empty)
+      let fields = nest(
+        hardline + series1(field_decls.map(x => fmt.field_decl(x)), semi),
+      )
+      let rbrace = hardline + char('}')
+      let deriving = fmt.deriving_directives(deriving)
+      doc +
+      attrs +
+      vis +
+      struct_ +
+      tycon +
+      params +
+      lbrace +
+      fields +
+      rbrace +
+      deriving
+    }
+    Error(exception_decl) => {
+      let struct_ = text("suberror")
+      let tycon = space + text(tycon)
+      let semi = switch(char(';'), empty)
+      let payload = match exception_decl {
+        NoPayload => empty
+        SinglePayload(ty) => space + fmt.ty(ty)
+        EnumPayload(constr_decls) =>
+          space +
+          braces(
+            series1(constr_decls.map(x => fmt.constr_decl(x)), semi),
+            force_newline=true,
+          )
+      }
+      doc + attrs + vis + struct_ + tycon + payload
+    }
+    Abstract => {
+      let type_ = text("type")
+      let tycon = space + text(tycon)
+      doc + attrs + vis + type_ + tycon
+    }
+    TupleStruct(tys) => {
+      let type_ = text("struct")
+      let tycon = space + text(tycon)
+      let tys = group(parens(series1(tys.map(x => fmt.ty(x)), comma)))
+      let params = fmt.type_decl_binders(params)
+      doc + attrs + vis + type_ + tycon + params + tys
+    }
+    Alias(ty) => {
+      let type_ = text("type")
+      let ty = space + fmt.ty(ty)
+      let as_ = space + text("as")
+      let tycon = space + text(tycon)
+      type_ + ty + as_ + tycon
+    }
+    Extern => abort("Deprecated syntax `extern type` is not supported.")
+    Newtype(_) => abort("Deprecated syntax newtype is not supported.")
+  }
 }
 
 ///|
@@ -969,6 +1252,7 @@ fn Fmt::parameter(
   fmt : Self,
   parameter : @syntax.Parameter,
   table : @comment.NodeTable,
+  is_trait_method? : Bool = false,
 ) -> Doc {
   ignore(table) // TODO: use table for comments
   match parameter {
@@ -998,14 +1282,20 @@ fn Fmt::parameter(
       }
       binder + ty
     }
-    DiscardPositional(ty~, loc=_) => {
-      let binder = char('_')
-      let ty = match ty {
-        None => empty
-        Some(ty) => space + colon + space + fmt.ty(ty)
+    DiscardPositional(ty~, loc=_) =>
+      if is_trait_method {
+        guard ty is Some(ty) else {
+          abort("Trait method parameter must have type annotation.")
+        }
+        fmt.ty(ty)
+      } else {
+        let binder = char('_')
+        let ty = match ty {
+          None => empty
+          Some(ty) => space + colon + space + fmt.ty(ty)
+        }
+        binder + ty
       }
-      binder + ty
-    }
     QuestionOptional(binder~, ty~) => {
       let binder = fmt.binder(binder) + char('?')
       let ty = match ty {
@@ -1018,6 +1308,10 @@ fn Fmt::parameter(
 }
 
 ///|
+/// 
+/// # Parameters
+/// - `is_trait_method`: Whether the parameters belong to a trait method. If true, 
+///     hide the parameter name if it is `DiscardPositional`. 
 fn Fmt::parameters(
   fmt : Self,
   parameters : List[@syntax.Parameter],
@@ -1025,13 +1319,14 @@ fn Fmt::parameters(
   param_tables~ : @comment.NodeTableArray,
   commas~ : @comment.NodeArray,
   rparen~ : @comment.Key?,
+  is_trait_method? : Bool = false,
 ) -> Doc {
   ignore(rparen) //TODO: use rparen comment
   let sep = comma
   let trailing = switch(empty, sep)
   let mut acc = empty
   for i, param in parameters {
-    acc += fmt.parameter(param, param_tables[i])
+    acc += fmt.parameter(param, param_tables[i], is_trait_method~)
     if i == parameters.length() - 1 {
       let trailing_comment = fmt.after_comment(Some(Node(param.loc())))
       let around_comments = fmt.wrap_comment(commas[i], empty)

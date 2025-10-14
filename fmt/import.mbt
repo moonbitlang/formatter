@@ -24,3 +24,6 @@ traitalias @syntax.MapVisitor
 
 ///|
 typealias @attribute.Attribute
+
+///|
+fnalias @trace.abort

@@ -1,5 +1,5 @@
 // generated file, do not edit!
-fn trailing_function() -> {
+fn trailing_function() {
   function_callback(
     a______________________,
     b________________________,
@@ -23,7 +23,7 @@ fn trailing_function() -> {
   )
 }
 
-fn trailing_arrow() -> {
+fn trailing_arrow() {
   function_callback(
     a______________________,
     b________________________,
@@ -47,7 +47,7 @@ fn trailing_arrow() -> {
   )
 }
 
-fn trailing_array() -> {
+fn trailing_array() {
   function_callback(
     a______________________,
     b________________________,
@@ -65,7 +65,7 @@ fn trailing_array() -> {
   ])
 }
 
-fn flatten_style() -> {
+fn flatten_style() {
   function_callback(a, b, c, fn(x, y) { a })
   function_callback(a, b, c, (x, y) => a)
   function_callback(a, b, c, [elem, elem, elem])

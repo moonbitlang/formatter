@@ -50,3 +50,48 @@ test "cases" (t : @test.T) {
 test "lab" (t : @test.T) {
   t.run()
 }
+
+///|
+test "typedecl_enum" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "typedecl_struct" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "typedecl_derive" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "typedecl_suberror" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "typedecl_type" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "typedecl_tuplestruct" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "typedecl_alias" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "trait_impl_decl" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "top_function" (t : @test.T) {
+  t.run()
+}

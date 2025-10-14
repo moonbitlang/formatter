@@ -1,0 +1,3 @@
+// generated file, do not edit!
+type (Int, Bool) as IntBoolPair
+
