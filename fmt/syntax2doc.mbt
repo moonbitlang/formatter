@@ -627,12 +627,6 @@ fn Fmt::visibility(fmt : Fmt, vis : @syntax.Visibility) -> Doc {
 }
 
 ///|
-fn Fmt::attributes(fmt : Fmt, attrs : List[Attribute]) -> Doc {
-  ignore((fmt, attrs))
-  empty //TODO
-}
-
-///|
 fn Fmt::docstring(fmt : Fmt, doc : @syntax.DocString) -> Doc {
   ignore((fmt, doc))
   empty //TODO

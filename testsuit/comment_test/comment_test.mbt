@@ -1,6 +1,6 @@
 ///|
 fn @test.T::run(t : Self) -> Unit raise {
-  let name = t.name
+  let name = t.name()
   let source = @fs.read_file_to_string(
     "./testsuit/comment_test/__snapshot__/\{name}.input",
   ) catch {

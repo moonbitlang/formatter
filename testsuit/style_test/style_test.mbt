@@ -1,6 +1,6 @@
 ///|
 fn @test.T::run(t : Self) -> Unit raise {
-  let name = t.name
+  let name = t.name()
   let source = @fs.read_file_to_string(
     "./testsuit/style_test/fixtures/\{name}.input",
   ) catch {
@@ -93,5 +93,10 @@ test "trait_impl_decl" (t : @test.T) {
 
 ///|
 test "top_function" (t : @test.T) {
+  t.run()
+}
+
+
+test "attribute" (t : @test.T) {
   t.run()
 }
