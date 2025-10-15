@@ -83,13 +83,21 @@ fn chained_dot_func_with_long_args() -> Unit {
       arg2_______________________,
       arg3_______________________,
     )
-    .method4(
+  TypeName::func(
+    arg1__________________________________________,
+    arg2__________________________________________,
+  )
+  .method1(
       arg1___________________,
       arg2_______________________,
       arg3_______________________,
     )
-    .method5(arg1___________________, arg2_______________________)
-    .method6(arg1___________________, arg2_______________________)
+    .method2(arg1___________________, arg2_______________________)
+    .method3(
+      arg1___________________,
+      arg2_______________________,
+      arg3_______________________,
+    )
 }
 
 fn chained_dot_in_rhs() -> Unit {
@@ -101,5 +109,33 @@ fn chained_dot_in_rhs() -> Unit {
     .method5(arg1___________________, arg2_______________________)
     .method6(arg1___________________, arg2_______________________)
   
+}
+
+fn single_dot() -> Unit {
+  object.long_method(
+    arg1___________________,
+    arg2_______________________,
+    arg3_______________________,
+  )
+  object.short_method(arg1, arg2, arg3)
+  record.field
+  tuple.1
+}
+
+fn mixing_dot_apply_and_record_label_and_tuple_index() -> Unit {
+  record.label1.method(arg1, arg2).label2.method(arg1, arg2)
+  record
+    .label1
+    .method(arg1________________, arg2________________)
+    .1
+    .label2
+    .method(arg1________________, arg2________________)
+    .2
+    .label3
+    .label4
+    .method(arg1________________, arg2________________)
+    .method(arg1________________, arg2________________)
+    .3
+    .4
 }
 

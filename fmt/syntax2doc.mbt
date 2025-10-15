@@ -1517,6 +1517,103 @@ fn Fmt::case_block(
 }
 
 ///|
+/// Handle chained expression like `self.f().g().field.1`.
+/// 
+/// Ideally, the chained method calls should be formatted like below:
+///
+/// ```skip
+/// some_object
+///   .long_method_call1(arg1, arg2)
+///   .long_method_call2(arg1)
+/// ```
+///
+/// However, if the lhs is too short or printing in several lines, it may 
+/// cause the entire expression weirdly indented.
+/// 
+/// Bad case 1: lhs is too short
+/// ```skip
+/// x
+///   .long_method_call1(arg1, arg2)
+///   .long_method_call2(arg1)
+/// ```
+/// 
+/// Bad case 2: lhs is printed in several lines, and the last line is too short
+/// ```skip
+/// {
+///   field1: value1,
+///   field2: value2,
+/// }
+///   .long_method_call1(arg1, arg2)
+///   .long_method_call2(arg1)
+/// ```
+/// 
+/// Bad case 3: the rhs is only one method call 
+/// ```skip
+/// object
+///   .long_method_call(
+///     long_arg1, 
+///     long_arg2,
+///   )
+/// ```
+fn Fmt::chained_dot_expr(fmt : Self, e : @syntax.Expr) -> RawExprDoc {
+  let xs = loop (@list.empty(), e) {
+    (acc, DotApply(self~, ..) as apply) => continue (acc.add(apply), self)
+    (acc, Field(record~, ..) as field) => continue (acc.add(field), record)
+    (acc, expr) => acc.add(expr)
+  }
+  guard xs is More(s, tail=chained_exprs)
+  let lhs = fmt.expr_before_dot(s)
+  let chained = separate_map(chained_exprs, softline, fn(expr) {
+    match expr {
+      DotApply(self=_, method_name~, args~, return_self~, attr=_, loc=_) => {
+        let dot = if return_self { text("..") } else { text(".") }
+        let method_name = fmt.label(method_name)
+        let args = fmt.arguments(args)
+        dot + method_name + args
+      }
+      Field(record=_, accessor~, loc=_) => fmt.accessor(accessor)
+      _ => panic() // unreachable
+    }
+  })
+  let apps = if chained_exprs is More(_, tail=Empty) {
+    group(chained)
+  } else {
+    group(
+      current_column_without_indent(fn(column) {
+        if lhs.requirement() < Space(3) {
+          // improve style in bad case 1
+          nest(chained)
+        } else if column < 3 {
+          // improve style in bad case 2
+          // multiline line lhs but `current_column - current_indent < 3`
+          softline + nest(chained)
+        } else {
+          nest(softline + chained)
+        }
+      }),
+    )
+  }
+  // The chained `a.b.c` should be `Collapsible`, so that if the expression
+  // needs line wrap and occurs in the rhs of `let lhs = rhs` or `lhs = rhs`, the 
+  // indentation will be correct.
+  // 
+  // Bad format: 4 spaces indentation
+  // ```
+  // let binder = some_long_lhs
+  //     .long_method_call1(arg1, arg2)
+  //     .long_method_call2(arg1)
+  // ```
+  //
+  // Good format: 2 spaces indentation
+  // ```
+  // let binder = some_long_lhs
+  //   .long_method_call1(arg1, arg2)
+  //   .long_method_call2(arg1)
+  // ```
+  Collapsible(lhs, apps)
+}
+
+///|
 fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
   match expr {
     Apply(func~, args~, attr=_, loc~) => {
@@ -1867,46 +1964,15 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = group(type_name + text("::") + record)
       Normal(doc)
     }
-    Field(record~, accessor~, loc=_) => {
-      let record = fmt.expr_before_dot(record)
-      let accessor = fmt.accessor(accessor)
-      let doc = record + accessor
-      Normal(doc)
-    }
     Method(type_name~, method_name~, loc=_) => {
       let type_name = fmt.type_name(type_name)
       let method_name = fmt.label(method_name)
       let doc = type_name + text("::") + method_name
       Normal(doc)
     }
-    DotApply(self=_, method_name=_, args=_, return_self=_, attr=_, loc=_) as e => {
-      let xs = loop (@list.empty(), e) {
-        (acc, DotApply(self~, ..) as apply) => continue (acc.add(apply), self)
-        (acc, expr) => acc.add(expr)
-      }
-      guard xs is More(s, tail=chained)
-      let lhs = fmt.expr_before_dot(s)
-      let chained = separate_map(chained, softline, fn(expr) {
-        guard expr
-          is DotApply(self=_, method_name~, args~, return_self~, attr=_, loc=_)
-        let dot = if return_self { text("..") } else { text(".") }
-        let method_name = fmt.label(method_name)
-        let args = fmt.arguments(args)
-        dot + method_name + args
-      })
-      let apps = group(
-        current_column_without_indent(fn(column) {
-          if lhs.requirement() < Space(3) { // single line lhs
-            nest(chained)
-          } else if column < 3 { // multiline line lhs but (next indent) - (current indent) < 3
-            softline + nest(chained)
-          } else {
-            nest(softline + chained)
-          }
-        }),
-      )
-      Collapsible(lhs, apps)
-    }
+    Field(record=_, accessor=_, loc=_) as e => fmt.chained_dot_expr(e)
+    DotApply(self=_, method_name=_, args=_, return_self=_, attr=_, loc=_) as e =>
+      fmt.chained_dot_expr(e)
     As(expr~, trait_~, loc=_) => {
       let expr = fmt.compose(expr, Simple)
       let as_ = space + text("as")
