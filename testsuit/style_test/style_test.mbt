@@ -96,7 +96,12 @@ test "top_function" (t : @test.T) {
   t.run()
 }
 
-
+///|
 test "attribute" (t : @test.T) {
+  t.run()
+}
+
+///|
+test "ffi" (t : @test.T) {
   t.run()
 }

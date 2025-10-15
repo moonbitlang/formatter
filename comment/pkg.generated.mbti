@@ -2,6 +2,7 @@
 package "moonbitlang/formatter/comment"
 
 import(
+  "Yoorkin/prettyprinter"
   "moonbitlang/core/list"
   "moonbitlang/parser/basic"
   "moonbitlang/parser/syntax"
@@ -20,7 +21,10 @@ pub(all) struct Comment {
   right : (@tokens.Token, @basic.Position, @basic.Position)?
   kind : CommentKind
 }
-impl @Yoorkin/prettyprinter.Pretty for Comment
+fn Comment::output(Self, &Logger) -> Unit // from trait `Show`
+fn Comment::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+fn Comment::to_string(Self) -> String // from trait `Show`
+impl @prettyprinter.Pretty for Comment
 impl Show for Comment
 
 pub(all) enum CommentKind {
@@ -28,15 +32,25 @@ pub(all) enum CommentKind {
   Block(String)
   Line(String)
 }
-impl @Yoorkin/prettyprinter.Pretty for CommentKind
+fn CommentKind::output(Self, &Logger) -> Unit // from trait `Show`
+fn CommentKind::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+fn CommentKind::to_string(Self) -> String // from trait `Show`
+impl @prettyprinter.Pretty for CommentKind
 impl Show for CommentKind
 
 pub(all) enum Key {
   Token(@basic.Location)
   Node(@basic.Location)
 }
+fn Key::compare(Self, Self) -> Int // from trait `Compare`
+fn Key::equal(Self, Self) -> Bool // from trait `Eq`
+fn Key::hash(Self) -> Int // from trait `Hash`
+fn Key::hash_combine(Self, Hasher) -> Unit // from trait `Hash`
 fn Key::loc(Self) -> @basic.Location
-impl @Yoorkin/prettyprinter.Pretty for Key
+#deprecated
+fn Key::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Key::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+impl @prettyprinter.Pretty for Key
 impl Compare for Key
 impl Eq for Key
 impl Hash for Key
@@ -54,7 +68,8 @@ type NodeArray
 fn NodeArray::empty() -> Self
 fn NodeArray::last(Self) -> Key?
 fn NodeArray::op_get(Self, Int) -> Key?
-impl @Yoorkin/prettyprinter.Pretty for NodeArray
+fn NodeArray::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+impl @prettyprinter.Pretty for NodeArray
 
 type NodeTable
 fn NodeTable::empty() -> Self
@@ -63,15 +78,18 @@ fn NodeTable::get_table(Self, String) -> Self
 fn NodeTable::get_table_array(Self, String) -> NodeTableArray
 fn NodeTable::get_token(Self, String) -> Key?
 fn NodeTable::new(Map[String, TokenGroup]) -> Self
-impl @Yoorkin/prettyprinter.Pretty for NodeTable
+fn NodeTable::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+impl @prettyprinter.Pretty for NodeTable
 
 type NodeTableArray
 fn NodeTableArray::empty() -> Self
 fn NodeTableArray::op_get(Self, Int) -> NodeTable
-impl @Yoorkin/prettyprinter.Pretty for NodeTableArray
+fn NodeTableArray::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+impl @prettyprinter.Pretty for NodeTableArray
 
 type TokenGroup
-impl @Yoorkin/prettyprinter.Pretty for TokenGroup
+fn TokenGroup::pretty(Self) -> @prettyprinter.Document // from trait `@prettyprinter.Pretty`
+impl @prettyprinter.Pretty for TokenGroup
 
 // Type aliases
 

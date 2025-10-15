@@ -314,22 +314,20 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       let (extern_, body) = match decl_body {
         DeclBody(local_types~, expr~) =>
           (empty, space + fmt.expr_block(expr, local_types~))
-        DeclStubs(Import(module_name~, func_name~)) =>
-          (
-            empty,
-            space +
-            equal +
-            double_quoted(text(module_name)) +
-            space +
-            double_quoted(text(func_name)),
-          )
+        DeclStubs(Import(module_name~, func_name~)) => {
+          let equal = space + char('=')
+          let module_name = space + double_quoted(text(module_name))
+          let func_name = space + double_quoted(text(func_name))
+          (empty, equal + module_name + func_name)
+        }
         DeclStubs(Embedded(language~, code~)) => {
           let extern_ = match language {
             None => empty
             Some(s) => text("extern") + space + double_quoted(text(s)) + space
           }
-          let code = fmt.embedded_code(code)
-          (extern_, space + code)
+          let equal = space + char('=')
+          let code = group(nest(line + fmt.embedded_code(code)))
+          (extern_, equal + code)
         }
       }
       let layout = doc +
@@ -461,7 +459,7 @@ fn Fmt::embedded_code(fmt : Fmt, code : @syntax.EmbeddedCode) -> Doc {
   match code {
     CodeString(s) => double_quoted(text(s))
     CodeMultilineString(xs) =>
-      softline + group(separate_map(xs, hardline, s => text("#|" + s)))
+      group(separate_map(xs, hardline, s => text("#|" + s)))
   }
 }
 
