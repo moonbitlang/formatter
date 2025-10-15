@@ -292,11 +292,10 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         tvar_tables=table.get_table_array("type_var_binders"),
         rbracket=table.get_token("rbracket"),
       )
-      let type_name = match type_name {
-        None => empty
-        Some(n) => fmt.type_name(n) + text("::")
+      let type_name_and_binder = match type_name {
+        None => space + fmt.binder(name)
+        Some(n) => space + fmt.type_name(n) + text("::") + fmt.binder(name)
       }
-      let binder = space + fmt.binder(name)
       let params = match decl_params {
         None => empty
         Some(xs) =>
@@ -337,8 +336,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         async_ +
         fn_ +
         quantifiers +
-        type_name +
-        binder +
+        type_name_and_binder +
         params +
         result +
         body
@@ -2092,6 +2090,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
     }
     ForEach(binders~, expr~, body~, else_block~, label~, loc=_) => {
       let label = fmt.loop_label(label, trailing_colon=true)
+      let for_ = text("for")
       fn foreach_binder2doc(binder : @syntax.Binder?) -> Doc {
         match binder {
           None => empty
@@ -2099,20 +2098,16 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
         }
       }
 
-      let binders = series(
-        binders,
-        comma,
-        foreach_binder2doc,
-        trailing=AlwaysHidden,
-      )
+      let binders = space +
+        group(series(binders, comma, foreach_binder2doc, trailing=AlwaysHidden))
       let in_ = space + text("in")
-      let expr = fmt.compose(expr, Infix(Other))
+      let expr = space + fmt.compose(expr, Infix(Other))
       let body = space + fmt.expr_block(body)
       let else_block = match else_block {
         None => empty
         Some(e) => fmt.expr_block(e)
       }
-      let doc = label + binders + in_ + expr + body + else_block
+      let doc = label + for_ + binders + in_ + expr + body + else_block
       Normal(doc)
     }
     Try(
