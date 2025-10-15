@@ -105,3 +105,8 @@ test "attribute" (t : @test.T) {
 test "ffi" (t : @test.T) {
   t.run()
 }
+
+///|
+test "arrow_function" (t : @test.T) {
+  t.run()
+}

@@ -576,12 +576,12 @@ fn Fmt::trait_method(fmt : Fmt, meth : @syntax.TraitMethodDecl) -> Doc {
   let async_ = if is_async { text("async") + space } else { empty }
   let name = text(name.name)
   let params = fmt.parameters(
-    is_trait_method=true,
     params,
     lparen=None,
     rparen=None,
     commas=@comment.NodeArray::empty(),
     param_tables=@comment.NodeTableArray::empty(),
+    kind=TraitMethod,
   )
   let arrow = space + text("->")
   let return_type = match return_type {
@@ -1242,7 +1242,7 @@ fn Fmt::parameter(
   fmt : Self,
   parameter : @syntax.Parameter,
   table : @comment.NodeTable,
-  is_trait_method? : Bool = false,
+  kind? : ParameterListKind = Regular,
 ) -> Doc {
   ignore(table) // TODO: use table for comments
   match parameter {
@@ -1273,7 +1273,7 @@ fn Fmt::parameter(
       binder + ty
     }
     DiscardPositional(ty~, loc=_) =>
-      if is_trait_method {
+      if kind is TraitMethod {
         guard ty is Some(ty) else {
           abort("Trait method parameter must have type annotation.")
         }
@@ -1298,10 +1298,21 @@ fn Fmt::parameter(
 }
 
 ///|
+priv enum ParameterListKind {
+  Regular
+  TraitMethod
+  ArrowFunction
+}
+
+///|
 /// 
 /// # Parameters
-/// - `is_trait_method`: Whether the parameters belong to a trait method. If true, 
-///     hide the parameter name if it is `DiscardPositional`. 
+/// 
+/// - `kind`: indicates the context of the parameters.
+///   If `kind` is:
+///   - Regular: print all parameters as is.
+///   - TraitMethod: hide the parameter name if it is `DiscardPositional`.
+///   - ArrowFunction: omit the parentheses if there is a single parameter.
 fn Fmt::parameters(
   fmt : Self,
   parameters : List[@syntax.Parameter],
@@ -1309,14 +1320,14 @@ fn Fmt::parameters(
   param_tables~ : @comment.NodeTableArray,
   commas~ : @comment.NodeArray,
   rparen~ : @comment.Key?,
-  is_trait_method? : Bool = false,
+  kind? : ParameterListKind = Regular,
 ) -> Doc {
   ignore(rparen) //TODO: use rparen comment
   let sep = comma
   let trailing = switch(empty, sep)
   let mut acc = empty
   for i, param in parameters {
-    acc += fmt.parameter(param, param_tables[i], is_trait_method~)
+    acc += fmt.parameter(param, param_tables[i], kind~)
     if i == parameters.length() - 1 {
       let trailing_comment = fmt.after_comment(Some(Node(param.loc())))
       let around_comments = fmt.wrap_comment(commas[i], empty)
@@ -1327,13 +1338,18 @@ fn Fmt::parameters(
     }
   }
   let l = softline
-  let lp = fmt.wrap_comment(lparen, char('('))
-  let rp = fmt.wrap_comment(lparen, char(')'))
-  lp + nest(l + acc) + l + rp
+  match kind {
+    ArrowFunction if parameters is More(_, tail=Empty) => acc
+    _ => {
+      let lp = fmt.wrap_comment(lparen, char('('))
+      let rp = fmt.wrap_comment(lparen, char(')'))
+      lp + nest(l + acc) + l + rp
+    }
+  }
 }
 
 ///|
-fn Fmt::arrow(
+fn Fmt::arrow_function(
   fmt : Self,
   parameters~ : @syntax.Parameters,
   body~ : @syntax.Expr,
@@ -1345,6 +1361,7 @@ fn Fmt::arrow(
       param_tables=@comment.NodeTableArray::empty(),
       commas=@comment.NodeArray::empty(),
       rparen=None,
+      kind=ArrowFunction,
     ),
   )
   let arrow = space + text("=>")
@@ -1763,7 +1780,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       match func {
         Lambda(parameters~, body~, kind~, ..) =>
           match kind {
-            Arrow => fmt.arrow(parameters~, body~)
+            Arrow => fmt.arrow_function(parameters~, body~)
             Lambda => fmt.func(func)
             Matrix => panic()
           }
