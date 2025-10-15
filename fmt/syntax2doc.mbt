@@ -1648,7 +1648,8 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
           rhs,
           Infix(InfixOperand(op=op_str, pos=RightOperand)),
         )
-        lhs + space + op + rhs
+        // TODO: improve the style for long, nested infix expressions
+        lhs + space + op + space + rhs
       }
       Normal(layout)
     }
