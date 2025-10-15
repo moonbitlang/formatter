@@ -10,6 +10,11 @@ import(
 )
 
 // Values
+fn[A : @prettyprinter.Pretty] pretty(A) -> @prettyprinter.Document
+
+let space : @prettyprinter.Document
+
+fn text(String) -> @prettyprinter.Document
 
 // Errors
 

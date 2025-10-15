@@ -1,20 +1,14 @@
 ///|
+using @basic {type Location, type Position}
+
+///|
+using @tokens {type TokenKind}
+
+///|
+using @pp {trait Pretty, space, text, pretty}
+
+///|
 typealias (@tokens.Token, @basic.Position, @basic.Position) as Triple
-
-///|
-typealias @basic.(Location, Position)
-
-///|
-typealias @tokens.TokenKind
-
-///|
-fnalias @pp.(text, pretty)
-
-///|
-let space = @pp.space
-
-///|
-traitalias @pp.Pretty
 
 ///|
 traitalias @syntax.IterVisitor as Visitor

@@ -1,29 +1,34 @@
 ///|
-typealias @pp.(Document as Doc, Requirement)
+using @pp {
+  group,
+  text,
+  char,
+  nest,
+  switch,
+  dynamic,
+  softline,
+  space,
+  type Document,
+  type Requirement
+}
 
 ///|
-typealias @list.List
+typealias Document as Doc
 
 ///|
-typealias @basic.Location
+using @basic {type Location}
 
 ///|
-fnalias @pp.(group, text, char, nest, switch, dynamic)
+using @list {type List}
 
 ///|
-let softline = @pp.softline
+using @syntax {trait MapVisitor}
 
 ///|
-let space = @pp.space
+using @attribute {type Attribute}
 
 ///|
-fnalias @cmp.maximum as max
+using @trace {abort}
 
 ///|
-traitalias @syntax.MapVisitor
-
-///|
-typealias @attribute.Attribute
-
-///|
-fnalias @trace.abort
+using @cmp {maximum}

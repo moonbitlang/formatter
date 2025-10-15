@@ -60,10 +60,10 @@ fn Fmt::compose_assign_rhs(
           let head_req = head.requirement()
           dynamic(ctx => {
             let current_remain = Requirement::Space(
-              max(0, ctx.width - ctx.indent),
+              maximum(0, ctx.width - ctx.indent),
             )
             let next_remain = Requirement::Space(
-              max(0, ctx.width - ctx.next_indent),
+              maximum(0, ctx.width - ctx.next_indent),
             )
             if current_remain >= rhs_req {
               // flatten style
