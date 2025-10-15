@@ -1,4 +1,5 @@
 // generated file, do not edit!
+///|
 fn collapsible_apply() -> Unit {
   let a = f(arg1, arg2)
   let Pattern_______________________________________________________ = 
@@ -17,6 +18,7 @@ fn collapsible_apply() -> Unit {
   
 }
 
+///|
 fn collapsible_array() -> Unit {
   let Pattern = [arg1, arg2]
   let Pattern_______________________________________________________ = [
@@ -32,6 +34,7 @@ fn collapsible_array() -> Unit {
   
 }
 
+///|
 fn collapsible_record() -> Unit {
   let Pattern = { field1, field2 }
   let Pattern_______________________________________________________ = {
@@ -47,6 +50,7 @@ fn collapsible_record() -> Unit {
   
 }
 
+///|
 fn collapsible_constraint() -> Unit {
   let Pattern = (expr : Anno)
   let Pattern_______________________________________________________ = (
@@ -60,6 +64,7 @@ fn collapsible_constraint() -> Unit {
   
 }
 
+///|
 fn collapsible_if() -> Unit {
   let Pattern = if a { b } else { c }
   let Pattern__________________________________________________________ = 
@@ -78,6 +83,7 @@ fn collapsible_if() -> Unit {
   
 }
 
+///|
 fn collapsible_dot_apply() -> Unit {
   let a = self.method(arg1, arg2)
   let Pattern_______________________________________________________ = 

@@ -1,28 +1,34 @@
 // generated file, do not edit!
+///|
 enum List[T] {
   Nil
   Cons(T, List[T])
 }
 
+///|
 enum CStyleEnum {
   Mode1 = 1
   Mode2 = 2
   Mode3 = 3
 }
 
+///|
 enum WithLabelEnum {
   Ctor1(label~ : Int, Bool)
   Ctor2(mut label~ : Int, Bool)
 }
 
+///|
 enum EmptyEnum {
   
 }
 
+///|
 enum TypeParamsLineWrap[T1, T2, T3, T4, T5] {
   
 }
 
+///|
 enum TypeParamsLineWrap2[
   T1______________,
   T2____________,
@@ -33,6 +39,7 @@ enum TypeParamsLineWrap2[
   
 }
 
+///|
 enum ConstrLineWrap {
   Constr2(Ty1, Ty2, Ty3, mut label~ : Ty4)
   Constr1(

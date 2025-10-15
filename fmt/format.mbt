@@ -8,8 +8,12 @@ pub fn impls_to_string(impls : @syntax.Impls) -> String {
 
 ///|
 pub fn format(source : String) -> String {
-  let { tokens, .. } = @lexer.tokens_from_string(comment=false, source)
+  let { tokens, docstrings, .. } = @lexer.tokens_from_string(
+    comment=true,
+    source,
+  )
   let (impls, diag) = @handrolled_parser.parse(tokens)
+  attach_docstrings(docstrings, impls)
   ignore(diag)
   impls
   |> RemoveGroup::process

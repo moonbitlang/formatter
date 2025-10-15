@@ -1,8 +1,10 @@
 // generated file, do not edit!
+///|
 fn chained_dot_oneline() -> Unit {
   Builder::new(args).f(args).g(args).h(args)
 }
 
+///|
 fn chained_dot() -> Unit {
   Builder::new(args)
     .method1(arg1___________________, arg2_______________________)
@@ -13,6 +15,7 @@ fn chained_dot() -> Unit {
     .method6(arg1___________________, arg2_______________________)
 }
 
+///|
 fn chained_dot_long_args() -> Unit {
   Builder::new(args)
     .method1(
@@ -35,6 +38,7 @@ fn chained_dot_long_args() -> Unit {
     .method6(arg1___________________, arg2_______________________)
 }
 
+///|
 fn chained_cascade() -> Unit {
   Builder::new(args)
     ..method1(arg1___________________, arg2_______________________)
@@ -45,6 +49,7 @@ fn chained_cascade() -> Unit {
     .method6(arg1___________________, arg2_______________________)
 }
 
+///|
 fn chained_dot_short_self() -> Unit {
   x.method1(arg1___________________, arg2_______________________)
     .method2(arg1___________________, arg2_______________________)
@@ -54,6 +59,7 @@ fn chained_dot_short_self() -> Unit {
     .method6(arg1___________________, arg2_______________________)
 }
 
+///|
 fn chained_dot_func() -> Unit {
   func(
     arg1__________________________________________,
@@ -67,6 +73,7 @@ fn chained_dot_func() -> Unit {
     .method6(arg1___________________, arg2_______________________)
 }
 
+///|
 fn chained_dot_func_with_long_args() -> Unit {
   func(
     arg1__________________________________________,
@@ -100,6 +107,7 @@ fn chained_dot_func_with_long_args() -> Unit {
     )
 }
 
+///|
 fn chained_dot_in_rhs() -> Unit {
   let a = Builder::new(args)
     .method1(arg1___________________, arg2_______________________)
@@ -111,6 +119,7 @@ fn chained_dot_in_rhs() -> Unit {
   
 }
 
+///|
 fn single_dot() -> Unit {
   object.long_method(
     arg1___________________,
@@ -122,6 +131,7 @@ fn single_dot() -> Unit {
   tuple.1
 }
 
+///|
 fn mixing_dot_apply_and_record_label_and_tuple_index() -> Unit {
   record.label1.method(arg1, arg2).label2.method(arg1, arg2)
   record

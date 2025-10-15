@@ -1,0 +1,73 @@
+// generated file, do not edit!
+///|
+/// docstring2
+fn f() -> Unit {
+  ...
+}
+
+///|
+/// Foo
+/// ....
+enum Foo {
+  /// Ctor1
+  /// xxx
+  Ctor1
+  /// Ctor2
+  /// yyy
+  Ctor2
+}
+
+///|
+/// ......
+struct Record {
+  /// field1
+  field1 : Int
+  /// field2
+  field2 : Int
+}
+
+///|
+trait MyTrait {
+  meth(Self) -> Self
+}
+
+///|
+impl MyTrait for Foo with meth(self) {
+  ...
+}
+
+///|
+impl MyTrait for Foo
+
+///|
+fn main {
+  
+}
+
+///|
+test{
+  
+}
+
+///|
+fn with_block_line() -> Unit {
+  ...
+}
+
+///| 
+/// doc
+fn with_doc() -> Unit {
+  ...
+}
+
+///|
+fn with_legacy_doc_style() -> Unit {
+  ...
+}
+
+///|
+///
+fn with_blank_doc() -> Unit {
+  ...
+}
+

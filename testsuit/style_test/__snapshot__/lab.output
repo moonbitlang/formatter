@@ -1,4 +1,5 @@
 // generated file, do not edit!
+///|
 fn arrow_with_ident_return_break_continue() -> _ {
   ignore((a_____________, b______________, c_________________________) => {
     return 

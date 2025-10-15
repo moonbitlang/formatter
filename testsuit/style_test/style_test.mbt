@@ -110,3 +110,8 @@ test "ffi" (t : @test.T) {
 test "arrow_function" (t : @test.T) {
   t.run()
 }
+
+///|
+test "docstring" (t : @test.T) {
+  t.run()
+}

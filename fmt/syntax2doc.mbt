@@ -19,6 +19,7 @@
 ///|
 priv struct Fmt {
   mapper : @comment.Mapper?
+  block_line : Bool
 }
 
 ///|
@@ -107,8 +108,8 @@ fn Fmt::get_table(fmt : Self, node : Location) -> @comment.NodeTable {
 }
 
 ///|
-fn Fmt::new(mapper? : @comment.Mapper) -> Self {
-  { mapper, }
+fn Fmt::new(mapper? : @comment.Mapper, block_line? : Bool = true) -> Self {
+  { mapper, block_line }
 }
 
 ///|
@@ -154,7 +155,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       doc~,
       loc~
     ) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let impl_ = text("impl")
@@ -218,7 +219,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       body
     }
     TopTrait({ name, supers, methods, vis, attrs, doc, loc: _ }) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let trait_ = text("trait")
@@ -247,7 +248,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       doc + attrs + vis + trait_ + name + supers + methods
     }
     TopLetDef(binder~, ty~, expr~, vis~, is_constant~, attrs~, doc~, loc=_) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let let_ = text(if is_constant { "const" } else { "let" })
@@ -276,7 +277,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         doc,
         params_loc: _,
       } = fun_decl
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let fn_ = fmt.wrap_comment(table.get_token("fn"), text("fn"))
@@ -343,7 +344,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       fmt.wrap_comment(Some(Node(loc)), layout)
     }
     TopTest(expr~, name~, params~, local_types~, attrs~, doc~, loc=_) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let test_ = text("test")
       let name = match name {
@@ -374,7 +375,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       fn_ + name + expr
     }
     TopImplRelation(self_ty~, trait_~, quantifiers~, vis~, attrs~, doc~, loc=_) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let impl_ = text("impl")
@@ -391,7 +392,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       doc + attrs + vis + impl_ + quantifiers + trait_ + for_ + self
     }
     TopBatchTraitAlias(pkg~, targets~, vis~, attrs~, is_list=_, doc~, loc=_) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let traitalias_ = text("traitalias") + space
@@ -406,7 +407,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       doc + attrs + vis + traitalias_ + pkg + targets
     }
     TopBatchTypeAlias(pkg~, targets~, vis~, attrs~, is_list=_, doc~, loc=_) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let typealias_ = text("typealias") + space
@@ -430,7 +431,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       doc~,
       loc=_
     ) => {
-      let doc = fmt.docstring(doc)
+      let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let fnalias_ = text("fnalias") + space
@@ -623,9 +624,32 @@ fn Fmt::visibility(fmt : Fmt, vis : @syntax.Visibility) -> Doc {
 }
 
 ///|
-fn Fmt::docstring(fmt : Fmt, doc : @syntax.DocString) -> Doc {
-  ignore((fmt, doc))
-  empty //TODO
+fn Fmt::docstring(
+  fmt : Fmt,
+  doc : @syntax.DocString,
+  is_toplevel~ : Bool,
+) -> Doc {
+  if fmt.block_line && is_toplevel {
+    match doc.content {
+      Empty => text("///|") + hardline
+      More(first_line, tail~) =>
+        if first_line.trim(char_set=" \t\n") == "" {
+          let first_line = text("///|") + text(first_line) + hardline
+          let remain_lines = concat_map(tail, x => text("///") +
+            text(x) +
+            hardline)
+          first_line + remain_lines
+        } else {
+          let first_line = text("///|") + hardline
+          let remain_lines = concat_map(tail, x => text("///") +
+            text(x) +
+            hardline)
+          first_line + remain_lines
+        }
+    }
+  } else {
+    concat_map(doc.content, x => text("///") + text(x) + hardline)
+  }
 }
 
 ///|
@@ -664,7 +688,7 @@ fn Fmt::constr_param(fmt : Self, constr_param : @syntax.ConstrParam) -> Doc {
 ///|
 fn Fmt::constr_decl(fmt : Self, constr_decl : @syntax.ConstrDecl) -> Doc {
   let { name, args, tag, loc, attrs, doc } = constr_decl
-  let doc = fmt.docstring(doc)
+  let doc = fmt.docstring(doc, is_toplevel=false)
   let attrs = fmt.attributes(attrs)
   let name = text(name.name)
   let args = match args {
@@ -712,7 +736,7 @@ fn Fmt::deriving_directives(
 ///|
 fn Fmt::field_decl(fmt : Self, field_decl : @syntax.FieldDecl) -> Doc {
   let { name, ty, mut_, vis, attrs, doc, loc } = field_decl
-  let doc = fmt.docstring(doc)
+  let doc = fmt.docstring(doc, is_toplevel=false)
   let attrs = fmt.attributes(attrs)
   let vis = fmt.visibility(vis)
   let mut_ = if mut_ { text("mut") + space } else { empty }
@@ -735,7 +759,7 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
     deriving,
     loc: _,
   } = typedecl
-  let doc = fmt.docstring(doc)
+  let doc = fmt.docstring(doc, is_toplevel=true)
   let attrs = fmt.attributes(attrs)
   let vis = fmt.visibility(type_vis)
   let semi = switch(char(';'), empty)

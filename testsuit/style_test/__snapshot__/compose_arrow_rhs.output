@@ -1,4 +1,5 @@
 // generated file, do not edit!
+///|
 fn arrow_ident_rhs() {
   (a_____________, b______________, c_____________________) => {
     (c__________________________________________________________)
@@ -6,6 +7,7 @@ fn arrow_ident_rhs() {
   (a_____________, b______________, c_____________________) => c__
 }
 
+///|
 fn arrow_with_record_rhs() {
   (a___________, b__________, c_________________) => { punning_field, }
   (a_____________, b______________, c_____________________) => {
@@ -18,6 +20,7 @@ fn arrow_with_record_rhs() {
   }
 }
 
+///|
 fn arrow_with_ident_return_break_continue() {
   ignore((a_____________, b______________, c_____________________) => {
     return 
@@ -30,12 +33,14 @@ fn arrow_with_ident_return_break_continue() {
   })
 }
 
+///|
 fn arrow_in_function_call_with_return_break_continue_rhs() {
   ignore((a, b) => { return  })
   ignore((a, b) => { return  })
   ignore((a, b) => { continue })
 }
 
+///|
 fn arrow_in_function_call_with_control_flow_rhs() {
   ignore((a, b) => {
     if e___________________ {
@@ -48,6 +53,7 @@ fn arrow_in_function_call_with_control_flow_rhs() {
   })
 }
 
+///|
 fn arrow_in_function_call_with_long_expr() {
   ignore((a, b) => {
     f____________________________________(

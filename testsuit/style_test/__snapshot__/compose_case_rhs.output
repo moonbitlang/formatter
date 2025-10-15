@@ -1,4 +1,5 @@
 // generated file, do not edit!
+///|
 fn collapsible_apply() -> Unit {
   match e {
     Pattern => f(arg1, arg2)
@@ -21,6 +22,7 @@ fn collapsible_apply() -> Unit {
   }
 }
 
+///|
 fn collapsible_array() -> Unit {
   match e {
     Pattern => [arg1, arg2]
@@ -37,6 +39,7 @@ fn collapsible_array() -> Unit {
   }
 }
 
+///|
 fn collapsible_record() -> Unit {
   match e {
     Pattern => { field1, field2 }
@@ -53,6 +56,7 @@ fn collapsible_record() -> Unit {
   }
 }
 
+///|
 fn collapsible_constraint() -> Unit {
   match e {
     Pattern => (expr : Anno)
@@ -67,6 +71,7 @@ fn collapsible_constraint() -> Unit {
   }
 }
 
+///|
 fn collapsible_if() -> Unit {
   match e {
     Pattern => if a { b } else { c }
@@ -89,6 +94,7 @@ fn collapsible_if() -> Unit {
   }
 }
 
+///|
 fn collapsible_ident() -> Unit {
   match e {
     Pattern => id
@@ -101,6 +107,7 @@ fn collapsible_ident() -> Unit {
   }
 }
 
+///|
 fn collapsible_dot_apply() -> Unit {
   match e {
     Pattern => self.method(arg1, arg2)
@@ -127,6 +134,7 @@ fn collapsible_dot_apply() -> Unit {
   }
 }
 
+///|
 fn collapsible_dot_apply_chain() -> Unit {
   match e {
     Pattern => self.method(arg1, arg2).method2(arg1, arg2)
@@ -157,6 +165,7 @@ fn collapsible_dot_apply_chain() -> Unit {
   }
 }
 
+///|
 fn not_collapsible_assign() -> Unit {
   match e {
     Pattern => a = b

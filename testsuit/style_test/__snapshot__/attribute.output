@@ -1,4 +1,5 @@
 // generated file, do not edit!
+///|
 #attribute1
 #attribute2(param1, param2="value", param3=true, f(a, b, c))
 #qual.attribute3
@@ -7,16 +8,19 @@ test{
   
 }
 
+///|
 #alias("xxx")
 fn f() -> Unit {
   
 }
 
+///|
 #cfg(target="xxx")
 struct Foo1 {
   
 }
 
+///|
 #cfg(target="xxx")
 enum Foo2 {
   
@@ -24,11 +28,13 @@ enum Foo2 {
 
 type (Int, Int) as IntPair
 
+///|
 #cfg(target="xxx")
 trait Foo3 {
   
 }
 
+///|
 #cfg(target="xxx")
 impl Foo4 for Int with f() {
   

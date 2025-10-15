@@ -1,4 +1,5 @@
 // generated file, do not edit!
+///|
 fn case1() -> Unit {
   match constant {
     BigInt(s) | Double(s) | Float(s) | UInt64(s) | UInt(s) | Int64(s) | Int(s) => 
@@ -6,6 +7,7 @@ fn case1() -> Unit {
   }
 }
 
+///|
 fn case2() -> Unit {
   match constant {
     BigInt(s) | Double(s) | Float(s) | UInt64(s) | UInt(s) | Int64(s) | Int(s) => 
@@ -13,6 +15,7 @@ fn case2() -> Unit {
   }
 }
 
+///|
 fn case3() -> Unit {
   match expr {
     Group(_) | StaticAssert(_) => {
@@ -22,6 +25,7 @@ fn case3() -> Unit {
   }
 }
 
+///|
 fn case4() -> Unit {
   match expr {
     Group(_) | StaticAssert(_) => {
@@ -44,12 +48,14 @@ fn case4() -> Unit {
   }
 }
 
+///|
 fn case5() -> Unit {
   match expr {
     Group(_) | StaticAssert(_) => { field1: 1, field2: 2, field3: 3 }
   }
 }
 
+///|
 fn compose() -> Unit {
   match a {
     Pattern(long_args, long_args) => if a { b } else { c }
