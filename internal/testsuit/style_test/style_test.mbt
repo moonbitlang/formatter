@@ -6,7 +6,7 @@ fn @test.T::run(
 ) -> Unit raise {
   let name = t.name()
   let source = @fs.read_file_to_string(
-    "./testsuit/style_test/fixtures/\{name}.input",
+    "./internal/testsuit/style_test/fixtures/\{name}.input",
   ) catch {
     _ => ""
   }

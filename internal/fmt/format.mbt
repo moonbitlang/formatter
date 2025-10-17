@@ -7,7 +7,7 @@ pub fn impls_to_string(impls : @syntax.Impls) -> String {
 }
 
 ///|
-pub fn format(source : String) -> String {
+pub fn format(source : String, block_line? : Bool = true) -> String {
   let { tokens, docstrings, .. } = @lexer.tokens_from_string(
     comment=true,
     source,
@@ -17,7 +17,7 @@ pub fn format(source : String) -> String {
   ignore(diag)
   impls
   |> RemoveGroup::process
-  |> then(x => Fmt::new().impls(x))
+  |> then(x => Fmt::new(block_line~).impls(x))
   |> @pp.render(width=80)
 }
 
@@ -51,5 +51,5 @@ pub fn debug_comment(source : String) -> (String, String) {
 
 ///|
 fn init {
-  ignore((format, debug_comment))
+  ignore(debug_comment)
 }

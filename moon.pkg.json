@@ -1,5 +1,5 @@
 {
   "import": [
-    "moonbitlang/formatter/fmt",
+    "moonbitlang/formatter/internal/fmt"
   ]
 }
