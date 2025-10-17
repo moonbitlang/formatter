@@ -836,11 +836,11 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
       doc + attrs + vis + type_ + tycon + params + tys
     }
     Alias(ty) => {
-      let type_ = text("type")
+      let type_ = text("typealias")
       let ty = space + fmt.ty(ty)
       let as_ = space + text("as")
       let tycon = space + text(tycon)
-      type_ + ty + as_ + tycon
+      doc + attrs + vis + type_ + ty + as_ + tycon
     }
     Extern => abort("Deprecated syntax `extern type` is not supported.")
     Newtype(_) => abort("Deprecated syntax newtype is not supported.")
