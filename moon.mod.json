@@ -9,8 +9,13 @@
     "moonbitlang/parser": "0.1.11"
   },
   "readme": "README.md",
-  "repository": "",
+  "repository": "https://github.com/moonbitlang/formatter",
   "license": "Apache-2.0",
-  "keywords": [],
-  "description": ""
+  "keywords": [
+    "MoonBit",
+    "formatter",
+    "prettifier",
+    "AST"
+  ],
+  "description": "code prettifier for MoonBit"
 }
