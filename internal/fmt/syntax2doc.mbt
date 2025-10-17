@@ -640,11 +640,12 @@ fn Fmt::docstring(
             hardline)
           first_line + remain_lines
         } else {
-          let first_line = text("///|") + hardline
+          let new_first_line = text("///|") + hardline
+          let old_first_line = text("///") + text(first_line) + hardline
           let remain_lines = concat_map(tail, x => text("///") +
             text(x) +
             hardline)
-          first_line + remain_lines
+          new_first_line + old_first_line + remain_lines
         }
     }
   } else {

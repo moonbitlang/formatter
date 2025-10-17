@@ -1,5 +1,6 @@
 // generated file, do not edit!
 ///|
+/// docstring1
 /// docstring2
 fn f() -> Unit {
   ...
@@ -18,6 +19,7 @@ enum Foo {
 }
 
 ///|
+/// record
 /// ......
 struct Record {
   /// field1
@@ -27,16 +29,19 @@ struct Record {
 }
 
 ///|
+/// trait
 trait MyTrait {
   meth(Self) -> Self
 }
 
 ///|
+/// impl
 impl MyTrait for Foo with meth(self) {
   ...
 }
 
 ///|
+/// impl relation
 impl MyTrait for Foo
 
 ///|
@@ -61,6 +66,7 @@ fn with_doc() -> Unit {
 }
 
 ///|
+/// doc
 fn with_legacy_doc_style() -> Unit {
   ...
 }
