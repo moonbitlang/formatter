@@ -154,41 +154,104 @@ fn Fmt::compose_case_rhs(fmt : Self, expr : @syntax.Expr, ctx : Context) -> Doc 
   let rhs = match infer_parens(ctx, kind) {
     NoParen =>
       match raw {
-        Normal(doc) => group(braces_if_not_flatten(doc))
-        // Bad case:
+        // For a normal RawExprDoc, we always wrap it with braces when it cannot 
+        // compose with `=>` in the same line.
         //
-        // To avoid following bad cases, for BlockLike expression, use composed style
-        //
-        // ```
-        // VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => 
-        //   [a, b, c, d, e, f, g, h]
-        // ```
-        BlockLike(doc) => composed_style(doc)
         // Bad case: 
+        // If the case rhs is a identifier, to avoid ambiguous with record containing 
+        // one punning field, we should avoid the `{}`.
+        Normal(doc) =>
+          if expr is Ident(_) {
+            nest(softline + doc)
+          } else {
+            group(braces_if_not_flatten(doc))
+          }
+
+        // For a block-like RawExprDoc, we always compose it directly with `composed_style`.
+        // This is because block-like structures usually already have their own paren/braces;
+        // adding extra braces or line wraps causes redundant indentation.
         //
-        // 1. To avoid following bad cases, if rhs fits in next line, use dangling style
-        //
-        // ```
-        // VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => func(
-        //   x,
-        // ) 
-        // ```
-        //
-        // 2. To avoid following bad cases, if the rhs need more than one line, 
-        // use normal style
-        //
+        // Bad case:
         // ```
         // match e {
-        //   P => {
-        //     long_expr
-        //   }
-        //   VeryLongPattern | VeryLongPattern | LongPattern => if condition {
-        //     long_expr
-        //   } else {
-        //     long_expr
-        //   }
+        //   VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => 
+        //     [a, b]
+        //   VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => 
+        //     [
+        //       long_a, 
+        //       long_b,
+        //     ]
         // }
         // ```
+        // 
+        // Ideally:
+        // ```
+        // match e {
+        //   VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => [
+        //     a, 
+        //     b, 
+        //   ]
+        //   VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => [
+        //     long_a, 
+        //     long_b,
+        //   ]
+        // }
+        // ```
+        BlockLike(doc) => composed_style(doc)
+
+        // For a collapsible RawExprDoc, we choose different styles based on the
+        // remaining space in the current and next lines.
+        //
+        // Bad case: 
+        // 1. if rhs fits in next line, use dangling style
+        //
+        //    Bad format result:
+        //    ```
+        //    VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => func(
+        //      x,
+        //    ) 
+        //    ```
+        //    
+        //    Ideal format result:
+        //    ```  
+        //    VeryLongPattern | VeryLongPattern | LongPattern | LongPattern => 
+        //      func(x)
+        //    ```
+        //
+        // 2. if the rhs need more than one line, use normal style
+        //
+        //    This avoids confusing layouts, especially in nested control 
+        //    flow expressions, when the control flow bodies have more than one 
+        //    part that looks like a block.
+        // 
+        //
+        //    Bad format result:
+        //    ```
+        //    match e {
+        //      VeryLongPattern | VeryLongPattern => try {
+        //        long_expr
+        //      } catch {
+        //        long_expr
+        //      } noraise {
+        //        long_expr
+        //      }
+        //    }
+        //    ```
+        //
+        //    Ideal format result:
+        //    ```
+        //    match e {
+        //      VeryLongPattern | VeryLongPattern => {
+        //        try {
+        //          long_expr
+        //        } catch {
+        //          long_expr
+        //        } noraise {
+        //          long_expr
+        //        }
+        //      }
+        //    }
+        //    ```
         Collapsible(head, body) => {
           let rhs_req = (head + body).requirement()
           dynamic(ctx => {
