@@ -22,6 +22,21 @@ pub fn format(source : String) -> String {
 }
 
 ///|
+/// for testing purposes, returns also the tokens
+pub fn parse(
+  source : String,
+) -> (@syntax.Impls, Array[@basic.Report], @tokens.Triples) {
+  let { tokens, docstrings, .. } = @lexer.tokens_from_string(
+    comment=true,
+    source,
+  )
+  let (impls, diag) = @handrolled_parser.parse(tokens)
+  attach_docstrings(docstrings, impls)
+  let impls = impls |> RemoveGroup::process
+  (impls, diag, tokens)
+}
+
+///|
 pub fn debug_comment(source : String) -> (String, String) {
   let { tokens, .. } = @lexer.tokens_from_string(comment=true, source)
   let (impls, _) = @handrolled_parser.parse(tokens)

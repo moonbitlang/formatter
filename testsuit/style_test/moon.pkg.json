@@ -1,6 +1,10 @@
 {
   "test-import": [
     "moonbitlang/formatter/fmt",
-    "moonbitlang/x/fs"
+    "moonbitlang/x/fs",
+    "moonbitlang/parser/handrolled_parser",
+    "moonbitlang/parser/syntax",
+    "moonbitlang/parser/lexer",
+    "moonbitlang/parser/basic"
   ]
 }

@@ -25,7 +25,7 @@ typealias (Int, Int) as IntPair
 trait Foo3 {}
 
 #cfg(target="xxx")
-impl Foo4 for Int with f{}
+impl Foo4 for Int with f(){}
 
 
 

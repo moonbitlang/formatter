@@ -26,7 +26,9 @@ enum Foo2 {
   
 }
 
-type (Int, Int) as IntPair
+///|
+#cfg(target="xxx")
+typealias (Int, Int) as IntPair
 
 ///|
 #cfg(target="xxx")

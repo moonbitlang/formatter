@@ -15,11 +15,6 @@ fn @test.T::run(t : Self) -> Unit raise {
 }
 
 ///|
-test "lab" (t : @test.T) {
-  t.run()
-}
-
-///|
 test "expr_sequence" (t : @test.T) {
   t.run()
 }
