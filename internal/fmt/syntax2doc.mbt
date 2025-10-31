@@ -857,15 +857,35 @@ fn Fmt::constant(fmt : Fmt, constant : @syntax.Constant) -> Doc {
     Bytes(s) => char('b') + double_quoted(text(s))
     Byte(s) => char('b') + single_quoted(text(s))
     Bool(b) => @pp.pretty(b)
-    BigInt(s)
-    | Double(s)
+    BigInt(s) => text(s) + char('N')
+    UInt64(s) => text(s) + char('U') + char('L')
+    UInt(s) => text(s) + char('U')
+    Int64(s) => text(s) + char('L')
+    Double(s)
     | Float(s)
-    | UInt64(s)
-    | UInt(s)
-    | Int64(s)
     | Int(s) => text(s)
   }
 }
+
+///|
+test "literal" {
+  fn case(literal) -> Unit {
+    let { tokens, .. } = @lexer.tokens_from_string(literal, comment=false)
+    let parsed = @handrolled_parser.parse(tokens)
+    impls_to_string(parsed.0) |> println
+  }
+
+  for
+    literal in [
+      "(42 : Int16)", "42", "1000L", "(14 : UInt16)", "14U", "14UL", "3.14", "(3.14 : Float)",
+      "10000000000000000000000N",
+    ].map(raw => (
+      $|let a = \{raw}
+    )) {
+    literal |> case
+  }
+}
+
 
 ///|
 fn Fmt::interps(fmt : Fmt, interps : List[@syntax.InterpElem]) -> Doc {
