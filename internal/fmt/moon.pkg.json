@@ -10,7 +10,6 @@
     "moonbitlang/parser/lexer",
     "moonbitlang/parser/handrolled_parser",
     "moonbitlang/formatter/internal/comment",
-    "moonbitlang/parser/attribute",
-    "Yoorkin/trace"
+    "moonbitlang/parser/attribute"
   ]
 }

@@ -2258,11 +2258,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = group(braces(series(elems, comma, map_expr_elem2doc)))
       Normal(doc)
     }
-    Group(expr~, ..) => {
-      expr.loc() |> println
-      fmt.expr(expr).to_doc() |> @pp.render() |> println
-      panic()
-    }
+    Group(expr~, ..) => abort(expr.to_json().stringify(indent=2))
     StaticAssert(_) => panic()
   }
 }

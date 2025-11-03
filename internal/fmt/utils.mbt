@@ -146,10 +146,3 @@ fn separate(xs : List[Doc], sep : Doc) -> Doc {
 fn current_column_without_indent(f : (Int) -> Doc) -> Doc {
   dynamic(fn(ctx) { f(ctx.indent - ctx.next_indent) })
 }
-
-///|
-#callsite(autofill(loc))
-fn[T] panic(loc~ : SourceLoc) -> T {
-  println("error at \{loc}")
-  @builtin.panic()
-}

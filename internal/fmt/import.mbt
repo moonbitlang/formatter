@@ -28,7 +28,4 @@ using @syntax {trait MapVisitor}
 using @attribute {type Attribute}
 
 ///|
-using @trace {abort}
-
-///|
 using @cmp {maximum}

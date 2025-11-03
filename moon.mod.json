@@ -1,10 +1,9 @@
 {
   "name": "moonbitlang/formatter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "deps": {
     "moonbitlang/x": "0.4.34",
     "Yoorkin/ArgParser": "0.1.11",
-    "Yoorkin/trace": "0.1.0",
     "Yoorkin/prettyprinter": "0.4.7",
     "moonbitlang/parser": "0.1.11"
   },
