@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitlang/formatter/testsuit/comment_test"
+package "moonbitlang/formatter/internal/testsuit/comment_test"
 
 // Values
 

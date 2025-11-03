@@ -1,8 +1,7 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitlang/formatter/fmt"
+package "moonbitlang/formatter/internal/fmt"
 
 import(
-  "Yoorkin/prettyprinter"
   "moonbitlang/core/list"
   "moonbitlang/parser/basic"
   "moonbitlang/parser/syntax"
@@ -10,34 +9,13 @@ import(
 )
 
 // Values
-#callsite(autofill(loc))
-fn[T] abort(String, loc~ : SourceLoc) -> T
-
-fn char(Char) -> @prettyprinter.Document
-
 fn debug_comment(String) -> (String, String)
 
-fn dynamic((@prettyprinter.Context) -> @prettyprinter.Document) -> @prettyprinter.Document
-
-fn format(String) -> String
-
-fn group(@prettyprinter.Document) -> @prettyprinter.Document
+fn format(String, block_line? : Bool) -> String
 
 fn impls_to_string(@list.List[@syntax.Impl]) -> String
 
-fn[T : Compare] maximum(T, T) -> T
-
-fn nest(indent? : Int, @prettyprinter.Document) -> @prettyprinter.Document
-
 fn parse(String) -> (@list.List[@syntax.Impl], Array[@basic.Report], Array[(@tokens.Token, @basic.Position, @basic.Position)])
-
-let softline : @prettyprinter.Document
-
-let space : @prettyprinter.Document
-
-fn switch(@prettyprinter.Document, @prettyprinter.Document) -> @prettyprinter.Document
-
-fn text(String) -> @prettyprinter.Document
 
 // Errors
 

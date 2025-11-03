@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitlang/formatter/comment"
+package "moonbitlang/formatter/internal/comment"
 
 import(
   "Yoorkin/prettyprinter"
@@ -10,11 +10,6 @@ import(
 )
 
 // Values
-fn[A : @prettyprinter.Pretty] pretty(A) -> @prettyprinter.Document
-
-let space : @prettyprinter.Document
-
-fn text(String) -> @prettyprinter.Document
 
 // Errors
 
