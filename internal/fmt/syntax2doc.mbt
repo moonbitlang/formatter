@@ -2034,7 +2034,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = record + accessor + op + field
       Normal(doc)
     }
-    Match(expr~, cases~, match_loc=_, using_=_, loc=_) => {
+    Match(expr~, cases~, match_loc=_, loc=_) => {
       let match_ = text("match")
       let cond = space + fmt.compose(expr, Infix(Other))
       let cases = space +
@@ -2129,17 +2129,12 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = continue_ + label + args
       Normal(doc)
     }
-    Loop(args~, body~, label~, loop_loc=_, loc=_) => {
+    Loop(arg~, body~, label~, loop_loc=_, loc=_) => {
       // deprecated multi-args syntax is not supported
-      guard args is More(arg, tail=Empty) else { panic() }
       let label = fmt.loop_label(label, trailing_colon=true)
       let loop_ = text("loop")
       let arg = space + fmt.compose(arg, Expr)
-      let cases : List[@syntax.Case] = body.map(case_ => {
-        // deprecated multi-args syntax is not supported
-        guard case_.patterns is More(pattern, tail=Empty) else { panic() }
-        { pattern, guard_: case_.guard_, body: case_.body }
-      })
+      let cases : List[@syntax.Case] = body
       let body = space + fmt.case_block(cases)
       let doc = label + loop_ + arg + body
       Normal(doc)
