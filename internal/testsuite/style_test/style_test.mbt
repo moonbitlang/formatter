@@ -6,7 +6,7 @@ fn @test.Test::run(
 ) -> Unit raise {
   let name = t.name()
   let source = @fs.read_file_to_string(
-    "./internal/testsuit/style_test/fixtures/\{name}.input",
+    "./internal/testsuite/style_test/fixtures/\{name}.input",
   ) catch {
     _ => ""
   }
@@ -180,4 +180,9 @@ test "arrow_function" (t : @test.Test) {
 ///|
 test "docstring" (t : @test.Test) {
   t.run(enable_ast_check=false)
+}
+
+///|
+test "constant_literals" (t : @test.Test) {
+  t.run()
 }

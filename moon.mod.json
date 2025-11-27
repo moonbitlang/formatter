@@ -1,6 +1,6 @@
 {
   "name": "moonbitlang/formatter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "deps": {
     "moonbitlang/x": "0.4.34",
     "Yoorkin/ArgParser": "0.1.11",

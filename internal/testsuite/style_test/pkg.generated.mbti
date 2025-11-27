@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitlang/formatter/internal/testsuit/style_test"
+package "moonbitlang/formatter/internal/testsuite/style_test"
 
 // Values
 
@@ -10,4 +10,3 @@ package "moonbitlang/formatter/internal/testsuit/style_test"
 // Type aliases
 
 // Traits
-
