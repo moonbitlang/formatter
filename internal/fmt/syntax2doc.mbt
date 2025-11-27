@@ -1175,7 +1175,7 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
     }
     Or(pat1~, pat2~, loc=_) => {
       let sep = line + char('|') + space
-  let pats = loop (@list.from_array([pat1]), pat2) {
+      let pats = loop (@list.from_array([pat1]), pat2) {
         (acc, Or(pat1~, pat2~, loc=_)) => continue (acc.add(pat1), pat2)
         (acc, pat) => acc.add(pat).rev()
       }

@@ -11,7 +11,12 @@ test "series" {
       #|4,
     ),
   )
-  let r2 = series(@list.from_array([1, 2, 3, 4]), comma, integer, trailing=AlwaysHidden)
+  let r2 = series(
+    @list.from_array([1, 2, 3, 4]),
+    comma,
+    integer,
+    trailing=AlwaysHidden,
+  )
   inspect(
     r2,
     content=(

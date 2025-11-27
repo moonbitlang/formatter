@@ -7,9 +7,9 @@ import(
 )
 
 // Values
-fn format(String, block_line? : Bool) -> String
+pub fn format(String, block_line? : Bool) -> String
 
-fn impls_to_string(@list.List[@syntax.Impl]) -> String
+pub fn impls_to_string(@list.List[@syntax.Impl]) -> String
 
 // Errors
 

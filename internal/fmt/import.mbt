@@ -9,7 +9,7 @@ using @pp {
   softline,
   space,
   type Document,
-  type Requirement
+  type Requirement,
 }
 
 ///|

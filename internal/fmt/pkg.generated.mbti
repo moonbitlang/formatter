@@ -9,13 +9,13 @@ import(
 )
 
 // Values
-fn debug_comment(String) -> (String, String)
+pub fn debug_comment(String) -> (String, String)
 
-fn format(String, block_line? : Bool) -> String
+pub fn format(String, block_line? : Bool) -> String
 
-fn impls_to_string(@list.List[@syntax.Impl]) -> String
+pub fn impls_to_string(@list.List[@syntax.Impl]) -> String
 
-fn parse(String) -> (@list.List[@syntax.Impl], Array[@basic.Report], Array[(@tokens.Token, @basic.Position, @basic.Position)])
+pub fn parse(String) -> (@list.List[@syntax.Impl], Array[@basic.Report], Array[(@tokens.Token, @basic.Position, @basic.Position)])
 
 // Errors
 
