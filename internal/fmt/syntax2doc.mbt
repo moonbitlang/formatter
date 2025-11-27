@@ -33,7 +33,7 @@ fn fmt_comment(comment : @comment.Comment) -> Doc {
 
 ///|
 fn fmt_comments(comments : Array[@comment.Comment]) -> Doc {
-  comments.map(fmt_comment).fold(init=empty, Doc::op_add)
+  comments.map(fmt_comment).fold(init=empty, Doc::add)
 }
 
 ///|
@@ -1078,8 +1078,8 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
         Some(args) => {
           let args = args.map(constr_pat_arg2doc)
           let args = if is_open {
-            //TODO: improve performance
-            args.concat(@list.of([text("..")]))
+            // Replace deprecated @list.of usage with from_array
+            args.concat(@list.from_array([text("..")]))
           } else {
             args
           }
@@ -1175,7 +1175,7 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
     }
     Or(pat1~, pat2~, loc=_) => {
       let sep = line + char('|') + space
-      let pats = loop (@list.of([pat1]), pat2) {
+  let pats = loop (@list.from_array([pat1]), pat2) {
         (acc, Or(pat1~, pat2~, loc=_)) => continue (acc.add(pat1), pat2)
         (acc, pat) => acc.add(pat).rev()
       }
@@ -1400,7 +1400,7 @@ fn Fmt::func(
   func : @syntax.Func,
   binder? : @syntax.Binder,
 ) -> RawExprDoc {
-  let is_annomyous = binder.is_empty()
+  let is_annomyous = binder is None
   match func {
     Lambda(
       parameters~,

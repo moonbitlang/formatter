@@ -8,7 +8,7 @@ using @tokens {type TokenKind}
 using @pp {trait Pretty, space, text, pretty}
 
 ///|
-typealias (@tokens.Token, @basic.Position, @basic.Position) as Triple
+type Triple = (@tokens.Token, @basic.Position, @basic.Position)
 
 ///|
-traitalias @syntax.IterVisitor as Visitor
+using @syntax { trait IterVisitor }

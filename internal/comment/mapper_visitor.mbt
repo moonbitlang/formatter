@@ -1,25 +1,25 @@
 ///|
-impl Visitor for Mapper with visit_Expr(self, expr) {
+impl IterVisitor for Mapper with visit_Expr(self, expr) {
   self..attach(Node(expr.loc())).base().visit_Expr(expr)
 }
 
 ///|
-impl Visitor for Mapper with visit_Pattern(self, pat) {
+impl IterVisitor for Mapper with visit_Pattern(self, pat) {
   self..attach(Node(pat.loc())).base().visit_Pattern(pat)
 }
 
 ///|
-impl Visitor for Mapper with visit_Type(self, ty) {
+impl IterVisitor for Mapper with visit_Type(self, ty) {
   self..attach(Node(ty.loc())).base().visit_Type(ty)
 }
 
 ///|
-impl Visitor for Mapper with visit_Impl(self, top) {
+impl IterVisitor for Mapper with visit_Impl(self, top) {
   self..attach(Node(top.loc())).base().visit_Impl(top)
 }
 
 ///|
-impl Visitor for Mapper with visit_Expr_Array(self, exprs~, loc~) {
+impl IterVisitor for Mapper with visit_Expr_Array(self, exprs~, loc~) {
   self.attach(Node(loc))
   self.cursor_advance(loc.start)
   let lbracket = self.cursor_find(TK_LBRACKET)
@@ -39,7 +39,7 @@ impl Visitor for Mapper with visit_Expr_Array(self, exprs~, loc~) {
 }
 
 ///|
-impl Visitor for Mapper with visit_Visibility(self, vis) {
+impl IterVisitor for Mapper with visit_Visibility(self, vis) {
   match vis {
     Default => ()
     Pub(attr~, loc~) => {
@@ -141,12 +141,12 @@ fn Mapper::fill_type_var_binder(
 }
 
 ///|
-impl Visitor for Mapper with visit_Binder(self, binder) {
+impl IterVisitor for Mapper with visit_Binder(self, binder) {
   self.attach_node(binder.loc)
 }
 
 ///|
-impl Visitor for Mapper with visit_Impl_TopFuncDef(
+impl IterVisitor for Mapper with visit_Impl_TopFuncDef(
   s,
   fun_decl~,
   decl_body~,

@@ -1,5 +1,5 @@
 ///|
-fn @test.T::run(
+fn @test.Test::run(
   t : Self,
   enable_ast_check? : Bool = true,
   enable_idempotent_check? : Bool = true,
@@ -110,74 +110,74 @@ fn ast_check(name~ : String, source~ : String, round1~ : String) -> Unit raise {
 // }
 
 ///|
-test "cases" (t : @test.T) {
+test "cases" (t : @test.Test) {
   // TODO: avoid printing trailing marks in the json
   t.run(enable_ast_check=false)
 }
 
 ///|
-test "typedecl_enum" (t : @test.T) {
+test "typedecl_enum" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "typedecl_struct" (t : @test.T) {
+test "typedecl_struct" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "typedecl_derive" (t : @test.T) {
+test "typedecl_derive" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "typedecl_suberror" (t : @test.T) {
+test "typedecl_suberror" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "typedecl_type" (t : @test.T) {
+test "typedecl_type" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "typedecl_tuplestruct" (t : @test.T) {
+test "typedecl_tuplestruct" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "typedecl_alias" (t : @test.T) {
+test "typedecl_alias" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "trait_impl_decl" (t : @test.T) {
+test "trait_impl_decl" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "top_function" (t : @test.T) {
+test "top_function" (t : @test.Test) {
   // TODO: adapt new parameter syntax in parser
   t.run(enable_ast_check=false)
 }
 
 ///|
-test "attribute" (t : @test.T) {
+test "attribute" (t : @test.Test) {
   // TODO: avoid printing attributes raw in the json
   t.run(enable_ast_check=false)
 }
 
 ///|
-test "ffi" (t : @test.T) {
+test "ffi" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "arrow_function" (t : @test.T) {
+test "arrow_function" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "docstring" (t : @test.T) {
+test "docstring" (t : @test.Test) {
   t.run(enable_ast_check=false)
 }

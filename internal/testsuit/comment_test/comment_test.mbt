@@ -1,5 +1,5 @@
 ///|
-fn @test.T::run(t : Self) -> Unit raise {
+fn @test.Test::run(t : Self) -> Unit raise {
   let name = t.name()
   let source = @fs.read_file_to_string(
     "./internal/testsuit/comment_test/__snapshot__/\{name}.input",
@@ -15,26 +15,26 @@ fn @test.T::run(t : Self) -> Unit raise {
 }
 
 ///|
-test "expr_sequence" (t : @test.T) {
+test "expr_sequence" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "expr_sequence_array" (t : @test.T) {
+test "expr_sequence_array" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "expr_sequence_array2" (t : @test.T) {
+test "expr_sequence_array2" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "expr_sequence_array3" (t : @test.T) {
+test "expr_sequence_array3" (t : @test.Test) {
   t.run()
 }
 
 ///|
-test "top_func" (t : @test.T) {
+test "top_func" (t : @test.Test) {
   t.run()
 }

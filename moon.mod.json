@@ -4,8 +4,8 @@
   "deps": {
     "moonbitlang/x": "0.4.34",
     "Yoorkin/ArgParser": "0.1.11",
-    "Yoorkin/prettyprinter": "0.4.7",
-    "moonbitlang/parser": "0.1.11"
+    "moonbitlang/parser": "0.1.11",
+    "Yoorkin/prettyprinter": "0.4.8"
   },
   "readme": "README.md",
   "repository": "https://github.com/moonbitlang/formatter",

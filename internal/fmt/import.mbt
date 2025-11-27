@@ -13,7 +13,7 @@ using @pp {
 }
 
 ///|
-typealias Document as Doc
+type Doc = Document
 
 ///|
 using @basic {type Location}
