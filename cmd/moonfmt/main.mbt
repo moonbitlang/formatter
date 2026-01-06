@@ -7,7 +7,12 @@ fn main {
     p => path = p,
     "",
     @env.args(),
-  )
+  ) catch {
+    e => {
+      println(e)
+      panic()
+    }
+  }
   let source = @fs.read_file_to_string(path) catch {
     e => {
       println(e)
