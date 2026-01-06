@@ -343,16 +343,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         body
       fmt.wrap_comment(Some(Node(loc)), layout)
     }
-    TopTest(
-      expr~,
-      name~,
-      params~,
-      local_types~,
-      is_async~,
-      loc=_,
-      attrs~,
-      doc~
-    ) => {
+    TopTest(expr~, name~, params~, local_types~, is_async~, loc=_, attrs~, doc~) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let async_ = if is_async { text("async") + space } else { empty }
