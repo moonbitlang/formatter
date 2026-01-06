@@ -23,6 +23,9 @@ enum TokenGroup {
 }
 
 ///|
+let _unused_table : TokenGroup = Table(empty_table)
+
+///|
 pub impl Pretty for TokenGroup with pretty(group) {
   match group {
     Token(k) => @pp.ctor("Token", [@pp.pretty(k)])

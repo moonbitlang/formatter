@@ -32,7 +32,7 @@ fn attr_expr2doc(expr : @attribute.Expr) -> Doc {
 
 ///|
 fn attribute2doc(attr : Attribute) -> Doc {
-  let { loc, raw, parsed } = attr
+  let { raw, parsed, loc: _ } = attr
   match parsed {
     None => text(raw)
     Some(expr) => text("#") + attr_expr2doc(expr)
@@ -40,6 +40,6 @@ fn attribute2doc(attr : Attribute) -> Doc {
 }
 
 ///|
-fn Fmt::attributes(fmt : Fmt, attrs : List[Attribute]) -> Doc {
+fn Fmt::attributes(_fmt : Fmt, attrs : List[Attribute]) -> Doc {
   concat_map(attrs, x => attribute2doc(x) + hardline)
 }

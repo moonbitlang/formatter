@@ -46,7 +46,7 @@ impl IterVisitor for Mapper with visit_Visibility(self, vis) {
       self.cursor_advance(loc.start)
       let modifier0 = self.cursor_find(TK_PUB, before_pos=loc.end)
       let lparen = self.cursor_find(TK_LPAREN, before_pos=loc.end)
-      let (modifier1, rparen) = if attr is Some(_) {
+      let (_modifier1, rparen) = if attr is Some(_) {
         let a = self.cursor_find(TK_LIDENT, before_token=TK_RPAREN)
         let b = self.cursor_find(TK_RPAREN, before_pos=loc.end)
         (a, b)

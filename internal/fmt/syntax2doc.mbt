@@ -153,7 +153,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       vis~,
       attrs~,
       doc~,
-      loc~
+      loc=_
     ) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
@@ -343,9 +343,19 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         body
       fmt.wrap_comment(Some(Node(loc)), layout)
     }
-    TopTest(expr~, name~, params~, local_types~, attrs~, doc~, loc=_) => {
+    TopTest(
+      expr~,
+      name~,
+      params~,
+      local_types~,
+      is_async~,
+      loc=_,
+      attrs~,
+      doc~
+    ) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
+      let async_ = if is_async { text("async") + space } else { empty }
       let test_ = text("test")
       let name = match name {
         None => empty
@@ -366,7 +376,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
           )
       }
       let body = fmt.expr_block(expr, local_types~)
-      doc + attrs + test_ + name + params + body
+      doc + attrs + async_ + test_ + name + params + body
     }
     TopExpr(expr~, is_main~, local_types~, loc=_) => {
       let fn_ = text("fn")
@@ -570,9 +580,9 @@ fn Fmt::trait_method(fmt : Fmt, meth : @syntax.TraitMethodDecl) -> Doc {
     params,
     return_type,
     error_type,
-    loc,
+    loc: _,
     has_default,
-    attrs,
+    attrs: _,
   } = meth
   let async_ = if is_async { text("async") + space } else { empty }
   let name = text(name.name)
@@ -592,7 +602,7 @@ fn Fmt::trait_method(fmt : Fmt, meth : @syntax.TraitMethodDecl) -> Doc {
   let error_type = fmt.error_type(error_type)
   let has_default = match has_default {
     None => empty
-    Some(loc) => space + char('=') + space + text("_")
+    Some(_) => space + char('=') + space + text("_")
   }
   group(async_ + name + params + arrow + return_type + error_type + has_default)
 }
@@ -654,8 +664,8 @@ fn Fmt::docstring(
 }
 
 ///|
-fn Fmt::type_decl_binder(fmt : Self, binder : @syntax.TypeDeclBinder) -> Doc {
-  let { name, loc } = binder
+fn Fmt::type_decl_binder(_fmt : Self, binder : @syntax.TypeDeclBinder) -> Doc {
+  let { name, loc: _ } = binder
   match name {
     None => text("_")
     Some(n) => text(n)
@@ -688,7 +698,7 @@ fn Fmt::constr_param(fmt : Self, constr_param : @syntax.ConstrParam) -> Doc {
 
 ///|
 fn Fmt::constr_decl(fmt : Self, constr_decl : @syntax.ConstrDecl) -> Doc {
-  let { name, args, tag, loc, attrs, doc } = constr_decl
+  let { name, args, tag, loc: _, attrs, doc } = constr_decl
   let doc = fmt.docstring(doc, is_toplevel=false)
   let attrs = fmt.attributes(attrs)
   let name = text(name.name)
@@ -698,7 +708,7 @@ fn Fmt::constr_decl(fmt : Self, constr_decl : @syntax.ConstrDecl) -> Doc {
   }
   let tag = match tag {
     None => empty
-    Some((tag, loc)) => space + char('=') + space + text(tag)
+    Some((tag, _)) => space + char('=') + space + text(tag)
   }
   doc + attrs + name + args + tag
 }
@@ -708,7 +718,7 @@ fn Fmt::deriving_directive(
   fmt : Self,
   deriving : @syntax.DerivingDirective,
 ) -> Doc {
-  let { type_name, args, loc } = deriving
+  let { type_name, args, loc: _ } = deriving
   let type_name = fmt.type_name(type_name)
   let args = match args {
     Empty => empty
@@ -736,7 +746,7 @@ fn Fmt::deriving_directives(
 
 ///|
 fn Fmt::field_decl(fmt : Self, field_decl : @syntax.FieldDecl) -> Doc {
-  let { name, ty, mut_, vis, attrs, doc, loc } = field_decl
+  let { name, ty, mut_, vis, attrs, doc, loc: _ } = field_decl
   let doc = fmt.docstring(doc, is_toplevel=false)
   let attrs = fmt.attributes(attrs)
   let vis = fmt.visibility(vis)
@@ -1092,8 +1102,9 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
       fn array_pattern2doc(pat : @syntax.ArrayPattern) -> Doc {
         match pat {
           Pattern(pat) => fmt.pattern(pat)
-          StringSpread(s) => text("..") + double_quoted(text(s))
-          BytesSpread(s) => text("..") + char('b') + double_quoted(text(s))
+          StringSpread(str~, loc=_) => text("..") + double_quoted(text(str))
+          BytesSpread(bytes~, loc=_) =>
+            text("..") + char('b') + double_quoted(text(bytes))
           ConstSpread(binder~, pkg~, loc=_) => {
             let pkg = match pkg {
               Some(x) => text("@\{x}.")
@@ -2033,7 +2044,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = record + accessor + op + field
       Normal(doc)
     }
-    Match(expr~, cases~, match_loc=_, using_=_, loc=_) => {
+    Match(expr~, cases~, match_loc=_, loc=_) => {
       let match_ = text("match")
       let cond = space + fmt.compose(expr, Infix(Other))
       let cases = space +
@@ -2128,18 +2139,11 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = continue_ + label + args
       Normal(doc)
     }
-    Loop(args~, body~, label~, loop_loc=_, loc=_) => {
-      // deprecated multi-args syntax is not supported
-      guard args is More(arg, tail=Empty) else { panic() }
+    Loop(arg~, body~, label~, loop_loc=_, loc=_) => {
       let label = fmt.loop_label(label, trailing_colon=true)
       let loop_ = text("loop")
       let arg = space + fmt.compose(arg, Expr)
-      let cases : List[@syntax.Case] = body.map(case_ => {
-        // deprecated multi-args syntax is not supported
-        guard case_.patterns is More(pattern, tail=Empty) else { panic() }
-        { pattern, guard_: case_.guard_, body: case_.body }
-      })
-      let body = space + fmt.case_block(cases)
+      let body = space + fmt.case_block(body)
       let doc = label + loop_ + arg + body
       Normal(doc)
     }
