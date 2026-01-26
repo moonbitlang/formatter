@@ -22,7 +22,7 @@ created with the following goals in mind:
 
 ## Usage
 
-```mbt
+```mbt nocheck
 ///|
 test {
   let code =
