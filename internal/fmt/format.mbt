@@ -2,7 +2,7 @@
 pub fn impls_to_string(impls : @syntax.Impls) -> String {
   impls
   |> RemoveGroup::process
-  |> then(x => Fmt::new().impls(x))
+  |> x => { Fmt::new().impls(x) }
   |> @pp.render(width=80)
 }
 
@@ -17,7 +17,7 @@ pub fn format(source : String, block_line? : Bool = true) -> String {
   ignore(diag)
   impls
   |> RemoveGroup::process
-  |> then(x => Fmt::new(block_line~).impls(x))
+  |> x => { Fmt::new(block_line~).impls(x) }
   |> @pp.render(width=80)
 }
 
@@ -44,7 +44,7 @@ pub fn debug_comment(source : String) -> (String, String) {
   let attach_info = mapper.to_debug_info()
   let ast = impls
     |> RemoveGroup::process
-    |> then(x => Fmt::new(mapper~).impls(x))
+    |> x => { Fmt::new(mapper~).impls(x) }
     |> @pp.render(width=80)
   (attach_info, ast)
 }

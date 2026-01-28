@@ -1,12 +1,12 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "moonbitlang/formatter/internal/fmt"
 
-import(
-  "moonbitlang/core/list"
-  "moonbitlang/parser/basic"
-  "moonbitlang/parser/syntax"
-  "moonbitlang/parser/tokens"
-)
+import {
+  "moonbitlang/core/list",
+  "moonbitlang/parser/basic",
+  "moonbitlang/parser/syntax",
+  "moonbitlang/parser/tokens",
+}
 
 // Values
 pub fn debug_comment(String) -> (String, String)

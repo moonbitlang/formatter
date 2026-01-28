@@ -1092,8 +1092,9 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
       fn array_pattern2doc(pat : @syntax.ArrayPattern) -> Doc {
         match pat {
           Pattern(pat) => fmt.pattern(pat)
-          StringSpread(s) => text("..") + double_quoted(text(s))
-          BytesSpread(s) => text("..") + char('b') + double_quoted(text(s))
+          StringSpread(str~, ..) => text("..") + double_quoted(text(str))
+          BytesSpread(bytes~, ..) =>
+            text("..") + char('b') + double_quoted(text(bytes))
           ConstSpread(binder~, pkg~, loc=_) => {
             let pkg = match pkg {
               Some(x) => text("@\{x}.")
@@ -2033,7 +2034,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = record + accessor + op + field
       Normal(doc)
     }
-    Match(expr~, cases~, match_loc=_, using_=_, loc=_) => {
+    Match(expr~, cases~, match_loc=_, loc=_) => {
       let match_ = text("match")
       let cond = space + fmt.compose(expr, Infix(Other))
       let cases = space +
@@ -2128,18 +2129,11 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = continue_ + label + args
       Normal(doc)
     }
-    Loop(args~, body~, label~, loop_loc=_, loc=_) => {
-      // deprecated multi-args syntax is not supported
-      guard args is More(arg, tail=Empty) else { panic() }
+    Loop(arg~, body~, label~, loop_loc=_, loc=_) => {
       let label = fmt.loop_label(label, trailing_colon=true)
       let loop_ = text("loop")
       let arg = space + fmt.compose(arg, Expr)
-      let cases : List[@syntax.Case] = body.map(case_ => {
-        // deprecated multi-args syntax is not supported
-        guard case_.patterns is More(pattern, tail=Empty) else { panic() }
-        { pattern, guard_: case_.guard_, body: case_.body }
-      })
-      let body = space + fmt.case_block(cases)
+      let body = space + fmt.case_block(body)
       let doc = label + loop_ + arg + body
       Normal(doc)
     }

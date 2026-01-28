@@ -2,9 +2,10 @@
   "name": "moonbitlang/formatter",
   "version": "0.1.2",
   "deps": {
-    "moonbitlang/x": "0.4.34",
-    "Yoorkin/ArgParser": "0.1.11",
-    "moonbitlang/parser": "0.1.11",
+    "moonbitlang/x": "0.4.38",
+    "Yoorkin/ArgParser": "0.2.0",
+    "moonbitlang/parser": "0.1.12",
+    "moonbitlang/yacc": "0.7.7",
     "Yoorkin/prettyprinter": "0.4.8"
   },
   "readme": "README.md",
