@@ -2,7 +2,7 @@
 fn @test.Test::run(t : Self) -> Unit raise {
   let name = t.name()
   let source = @fs.read_file_to_string(
-    "./internal/testsuitee/comment_test/__snapshot__/\{name}.input",
+    "./internal/testsuite/comment_test/__snapshot__/\{name}.input",
   ) catch {
     _ => ""
   }

@@ -6,6 +6,8 @@
     {
       "path": "Yoorkin/prettyprinter",
       "alias": "pp"
-    }
+    },
+    "moonbitlang/core/queue",
+    "moonbitlang/core/sorted_map"
   ]
 }

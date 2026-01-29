@@ -10,6 +10,11 @@
     "moonbitlang/parser/lexer",
     "moonbitlang/parser/handrolled_parser",
     "moonbitlang/formatter/internal/comment",
-    "moonbitlang/parser/attribute"
+    "moonbitlang/parser/attribute",
+    "moonbitlang/core/cmp",
+    "moonbitlang/core/list"
+  ],
+  "wbtest-import": [
+    "moonbitlang/core/list"
   ]
 }

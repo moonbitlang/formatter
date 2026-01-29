@@ -3,6 +3,8 @@
     "moonbitlang/formatter/internal/fmt",
     "moonbitlang/x/fs",
     "moonbitlang/parser/syntax",
-    "moonbitlang/parser/basic"
-  ]
+    "moonbitlang/parser/basic",
+    "moonbitlang/core/test"
+  ],
+  "import": []
 }
