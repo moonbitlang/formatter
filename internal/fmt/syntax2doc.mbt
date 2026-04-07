@@ -1186,9 +1186,11 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
     }
     Or(pat1~, pat2~, loc=_) => {
       let sep = line + char('|') + space
-      let pats = loop (@list.from_array([pat1]), pat2) {
-        (acc, Or(pat1~, pat2~, loc=_)) => continue (acc.add(pat1), pat2)
-        (acc, pat) => acc.add(pat).rev()
+      let pats = for acc = @list.from_array([pat1]), pat2 = pat2 {
+        match pat2 {
+          Or(pat1~, pat2~, loc=_) => continue acc.add(pat1), pat2
+          pat => break acc.add(pat).rev()
+        }
       }
       let lparen = switch(empty, char('(') + space)
       let pats = separate(pats.map(x => fmt.pattern(x)), sep)
@@ -1597,10 +1599,12 @@ fn Fmt::case_block(
 ///   )
 /// ```
 fn Fmt::chained_dot_expr(fmt : Self, e : @syntax.Expr) -> RawExprDoc {
-  let xs = loop (@list.empty(), e) {
-    (acc, DotApply(self~, ..) as apply) => continue (acc.add(apply), self)
-    (acc, Field(record~, ..) as field) => continue (acc.add(field), record)
-    (acc, expr) => acc.add(expr)
+  let xs = for acc = @list.empty(), e = e {
+    match e {
+      DotApply(self~, ..) as apply => continue acc.add(apply), self
+      Field(record~, ..) as field => continue acc.add(field), record
+      expr => break acc.add(expr)
+    }
   }
   guard xs is More(s, tail=chained_exprs)
   let lhs = fmt.expr_before_dot(s)

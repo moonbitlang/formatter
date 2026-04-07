@@ -17,7 +17,7 @@ pub fn NodeTable::empty() -> NodeTable {
 ///|
 enum TokenGroup {
   Token(Key?)
-  Table(NodeTable)
+  // Table(NodeTable)
   TokenArray(NodeArray)
   TableArray(NodeTableArray)
 }
@@ -26,7 +26,7 @@ enum TokenGroup {
 pub impl Pretty for TokenGroup with pretty(group) {
   match group {
     Token(k) => @pp.ctor("Token", [@pp.pretty(k)])
-    Table(t) => @pp.ctor("Table", [@pp.pretty(t)])
+    // Table(t) => @pp.ctor("Table", [@pp.pretty(t)])
     TokenArray(a) => @pp.ctor("TokenArray", [@pp.pretty(a)])
     TableArray(a) => @pp.ctor("TableArray", [@pp.pretty(a)])
   }
@@ -68,7 +68,7 @@ pub fn NodeTable::get_token(self : Self, name : String) -> Key? {
 ///|
 pub fn NodeTable::get_table(self : Self, name : String) -> NodeTable {
   match self.0.get(name) {
-    Some(Table(tbl)) => tbl
+    // Some(Table(tbl)) => tbl
     _ => empty_table
   }
 }

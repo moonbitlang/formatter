@@ -3,6 +3,7 @@ package "moonbitlang/formatter/internal/comment"
 
 import {
   "Yoorkin/prettyprinter",
+  "moonbitlang/core/debug",
   "moonbitlang/core/list",
   "moonbitlang/parser/basic",
   "moonbitlang/parser/syntax",
@@ -20,27 +21,22 @@ pub(all) struct Comment {
   left : (@tokens.Token, @basic.Position, @basic.Position)?
   right : (@tokens.Token, @basic.Position, @basic.Position)?
   kind : CommentKind
-}
+} derive(@debug.Debug)
 pub impl @prettyprinter.Pretty for Comment
-pub impl Show for Comment
 
 pub(all) enum CommentKind {
   Blank
   Block(String)
   Line(String)
-}
+} derive(@debug.Debug)
 pub impl @prettyprinter.Pretty for CommentKind
-pub impl Show for CommentKind
 
 pub(all) enum Key {
   Token(@basic.Location)
   Node(@basic.Location)
-}
+} derive(Compare, Eq, Hash)
 pub fn Key::loc(Self) -> @basic.Location
 pub impl @prettyprinter.Pretty for Key
-pub impl Compare for Key
-pub impl Eq for Key
-pub impl Hash for Key
 
 type Mapper
 pub fn Mapper::consume_comments(Self, Key?, (Comment) -> Bool) -> Array[Comment]

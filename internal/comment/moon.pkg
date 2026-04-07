@@ -5,4 +5,5 @@ import {
   "Yoorkin/prettyprinter" @pp,
   "moonbitlang/core/queue",
   "moonbitlang/core/sorted_map",
+  "moonbitlang/core/debug",
 }
