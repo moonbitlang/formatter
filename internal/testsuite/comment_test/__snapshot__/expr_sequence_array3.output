@@ -34,7 +34,13 @@ fn g() -> Unit {
     loc: -3:5-3:8,
     surround: (
       LIDENT("f") (-3:3-3:4),
-      COMMENT({content: "// 3", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-4:3-4:7)
+      COMMENT(
+  {
+    content: "// 3",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-4:3-4:7)
     ),
   },
   {
@@ -57,7 +63,13 @@ fn g() -> Unit {
     loc: -7:11-7:26,
     surround: (
       COMMA (-7:9-7:10),
-      COMMENT({content: "//7", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-8:7-8:10)
+      COMMENT(
+  {
+    content: "//7",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-8:7-8:10)
     ),
   },
   {
@@ -70,7 +82,13 @@ fn g() -> Unit {
     loc: -9:11-9:47,
     surround: (
       COMMA (-9:9-9:10),
-      COMMENT({content: "//9", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-10:7-10:10)
+      COMMENT(
+  {
+    content: "//9",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-10:7-10:10)
     ),
   },
   {
@@ -88,7 +106,13 @@ fn g() -> Unit {
     loc: -12:5-12:9,
     surround: (
       RBRACKET (-12:3-12:4),
-      COMMENT({content: "//11a", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-13:3-13:8)
+      COMMENT(
+  {
+    content: "//11a",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-13:3-13:8)
     ),
   },
   {
@@ -96,7 +120,13 @@ fn g() -> Unit {
     loc: -13:3-13:8,
     surround: (
       RBRACKET (-12:3-12:4),
-      COMMENT({content: "//11b", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-14:3-14:8)
+      COMMENT(
+  {
+    content: "//11b",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-14:3-14:8)
     ),
   },
   {
@@ -104,7 +134,13 @@ fn g() -> Unit {
     loc: -14:3-14:8,
     surround: (
       RBRACKET (-12:3-12:4),
-      COMMENT({content: "//11c", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-15:3-15:8)
+      COMMENT(
+  {
+    content: "//11c",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-15:3-15:8)
     ),
   },
   {
@@ -117,7 +153,13 @@ fn g() -> Unit {
     loc: -16:5-16:9,
     surround: (
       LIDENT("h") (-16:3-16:4),
-      COMMENT({content: "//13", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-17:3-17:7)
+      COMMENT(
+  {
+    content: "//13",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-17:3-17:7)
     ),
   },
   {
@@ -158,7 +200,13 @@ fn g() -> Unit {
       loc: -7:11-7:26,
       surround: (
         COMMA (-7:9-7:10),
-        COMMENT({content: "//7", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-8:7-8:10)
+        COMMENT(
+  {
+    content: "//7",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-8:7-8:10)
       ),
     }
   ],
@@ -168,7 +216,13 @@ fn g() -> Unit {
       loc: -9:11-9:47,
       surround: (
         COMMA (-9:9-9:10),
-        COMMENT({content: "//9", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-10:7-10:10)
+        COMMENT(
+  {
+    content: "//9",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-10:7-10:10)
       ),
     }
   ],
@@ -206,7 +260,13 @@ fn g() -> Unit {
       loc: -3:5-3:8,
       surround: (
         LIDENT("f") (-3:3-3:4),
-        COMMENT({content: "// 3", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-4:3-4:7)
+        COMMENT(
+  {
+    content: "// 3",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-4:3-4:7)
       ),
     }
   ],
@@ -221,7 +281,13 @@ fn g() -> Unit {
       loc: -16:5-16:9,
       surround: (
         LIDENT("h") (-16:3-16:4),
-        COMMENT({content: "//13", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-17:3-17:7)
+        COMMENT(
+  {
+    content: "//13",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-17:3-17:7)
       ),
     }
   ],
@@ -236,7 +302,13 @@ fn g() -> Unit {
       loc: -12:5-12:9,
       surround: (
         RBRACKET (-12:3-12:4),
-        COMMENT({content: "//11a", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-13:3-13:8)
+        COMMENT(
+  {
+    content: "//11a",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-13:3-13:8)
       ),
     },
     {
@@ -244,7 +316,13 @@ fn g() -> Unit {
       loc: -13:3-13:8,
       surround: (
         RBRACKET (-12:3-12:4),
-        COMMENT({content: "//11b", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-14:3-14:8)
+        COMMENT(
+  {
+    content: "//11b",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-14:3-14:8)
       ),
     }
   ],
@@ -261,7 +339,13 @@ fn g() -> Unit {
       loc: -14:3-14:8,
       surround: (
         RBRACKET (-12:3-12:4),
-        COMMENT({content: "//11c", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-15:3-15:8)
+        COMMENT(
+  {
+    content: "//11c",
+    kind: Ownline(leading_blank_line=false, trailing_blank_line=false),
+    consumed_by_docstring: false,
+  },
+) (-15:3-15:8)
       ),
     },
     {
