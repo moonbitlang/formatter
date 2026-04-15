@@ -214,8 +214,7 @@ impl IterVisitor for Mapper with visit_Impl_TopFuncDef(
       let rb = s.cursor_find(TK_RBRACE, before_pos=loc.end)
       (lb, rb)
     }
-    DeclStubs(_) => (None, None)
-    DeclNone => (None, None)
+    DeclStubs(_) | DeclNone => (None, None)
   }
   s.table[Node(loc)] = NodeTable::new({
     "async": Token(async_),

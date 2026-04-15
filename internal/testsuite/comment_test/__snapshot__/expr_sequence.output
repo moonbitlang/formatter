@@ -19,107 +19,61 @@ fn g() -> Unit {
   {
     kind: //1,
     loc: -2:3-2:6,
-    surround: (LBRACE (-1:16-1:17), LIDENT("f") (-3:3-3:4)),
+    surround: (`{` (-1:16-1:17), id (lowercase start) (-3:3-3:4)),
   },
-  {
-    kind: //2,
-    loc: -3:7-3:10,
-    surround: (
-      RPAREN (-3:5-3:6),
-      COMMENT({content: "//3", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-4:3-4:6)
-    ),
-  },
+  {kind: //2, loc: -3:7-3:10, surround: (`)` (-3:5-3:6), COMMENT (-4:3-4:6))},
   {
     kind: //3,
     loc: -4:3-4:6,
-    surround: (RPAREN (-3:5-3:6), LIDENT("g") (-5:3-5:4)),
+    surround: (`)` (-3:5-3:6), id (lowercase start) (-5:3-5:4)),
   },
-  {
-    kind: //4,
-    loc: -5:7-5:10,
-    surround: (
-      RPAREN (-5:5-5:6),
-      COMMENT({content: "//5", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-6:3-6:6)
-    ),
-  },
+  {kind: //4, loc: -5:7-5:10, surround: (`)` (-5:5-5:6), COMMENT (-6:3-6:6))},
   {
     kind: //5,
     loc: -6:3-6:6,
-    surround: (RPAREN (-5:5-5:6), LIDENT("h") (-7:3-7:4)),
+    surround: (`)` (-5:5-5:6), id (lowercase start) (-7:3-7:4)),
   },
-  {
-    kind: //6,
-    loc: -7:7-7:10,
-    surround: (
-      RPAREN (-7:5-7:6),
-      COMMENT({content: "//7", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-8:3-8:6)
-    ),
-  },
-  {kind: //7, loc: -8:3-8:6, surround: (RPAREN (-7:5-7:6), RBRACE (-9:1-9:2))},
-  {kind: BLANK, loc: -9:2-10:2, surround: (RBRACE (-9:1-9:2), FN (-11:1-11:3))},
+  {kind: //6, loc: -7:7-7:10, surround: (`)` (-7:5-7:6), COMMENT (-8:3-8:6))},
+  {kind: //7, loc: -8:3-8:6, surround: (`)` (-7:5-7:6), `}` (-9:1-9:2))},
+  {kind: BLANK, loc: -9:2-10:2, surround: (`}` (-9:1-9:2), `fn` (-11:1-11:3))},
   {
     kind: BLANK,
     loc: -11:18-14:2,
-    surround: (RBRACE (-11:17-11:18), EOF (-15:1-15:1)),
+    surround: (`}` (-11:17-11:18), EOF (-15:1-15:1)),
   }
 ]
 
 {
   -9:1-9:2: [
-    {kind: //7, loc: -8:3-8:6, surround: (RPAREN (-7:5-7:6), RBRACE (-9:1-9:2))}
+    {kind: //7, loc: -8:3-8:6, surround: (`)` (-7:5-7:6), `}` (-9:1-9:2))}
   ],
   -1:1-9:2: [
-    {
-      kind: BLANK,
-      loc: -9:2-10:2,
-      surround: (RBRACE (-9:1-9:2), FN (-11:1-11:3)),
-    }
+    {kind: BLANK, loc: -9:2-10:2, surround: (`}` (-9:1-9:2), `fn` (-11:1-11:3))}
   ],
   -3:3-3:6: [
-    {
-      kind: //2,
-      loc: -3:7-3:10,
-      surround: (
-        RPAREN (-3:5-3:6),
-        COMMENT({content: "//3", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-4:3-4:6)
-      ),
-    }
+    {kind: //2, loc: -3:7-3:10, surround: (`)` (-3:5-3:6), COMMENT (-4:3-4:6))}
   ],
   -3:3-7:6: [
     {
       kind: //1,
       loc: -2:3-2:6,
-      surround: (LBRACE (-1:16-1:17), LIDENT("f") (-3:3-3:4)),
+      surround: (`{` (-1:16-1:17), id (lowercase start) (-3:3-3:4)),
     },
-    {
-      kind: //6,
-      loc: -7:7-7:10,
-      surround: (
-        RPAREN (-7:5-7:6),
-        COMMENT({content: "//7", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-8:3-8:6)
-      ),
-    }
+    {kind: //6, loc: -7:7-7:10, surround: (`)` (-7:5-7:6), COMMENT (-8:3-8:6))}
   ],
   -5:3-5:6: [
     {
       kind: //3,
       loc: -4:3-4:6,
-      surround: (RPAREN (-3:5-3:6), LIDENT("g") (-5:3-5:4)),
+      surround: (`)` (-3:5-3:6), id (lowercase start) (-5:3-5:4)),
     },
-    {
-      kind: //4,
-      loc: -5:7-5:10,
-      surround: (
-        RPAREN (-5:5-5:6),
-        COMMENT({content: "//5", kind: Ownline(leading_blank_line=false, trailing_blank_line=false), consumed_by_docstring: false}) (-6:3-6:6)
-      ),
-    }
+    {kind: //4, loc: -5:7-5:10, surround: (`)` (-5:5-5:6), COMMENT (-6:3-6:6))}
   ],
   -7:3-7:6: [
     {
       kind: //5,
       loc: -6:3-6:6,
-      surround: (RPAREN (-5:5-5:6), LIDENT("h") (-7:3-7:4)),
+      surround: (`)` (-5:5-5:6), id (lowercase start) (-7:3-7:4)),
     }
   ]
 }

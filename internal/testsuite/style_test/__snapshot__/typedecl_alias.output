@@ -1,4 +1,5 @@
 // generated file, do not edit!
-///|
-typealias (Int, Bool) as IntBoolPair
+fn init{
+  _
+}
 

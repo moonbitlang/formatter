@@ -5,14 +5,14 @@ pub(all) struct Comment {
   left : Triple?
   right : Triple?
   kind : CommentKind
-} derive(Show)
+} derive(@debug.Debug)
 
 ///|
 fn pretty_triple(x : Triple?) -> @pp.Document {
   match x {
     None => text("None")
     Some(x) =>
-      text(x.0.to_string()) +
+      text(x.0.to_expect_string()) +
       space +
       @pp.parens(text(Location::{ start: x.1, end: x.2 }.to_string()))
   }
@@ -37,7 +37,7 @@ pub(all) enum CommentKind {
   Blank
   Block(String)
   Line(String)
-} derive(Show)
+} derive(@debug.Debug)
 
 ///|
 pub impl Pretty for CommentKind with pretty(x) {

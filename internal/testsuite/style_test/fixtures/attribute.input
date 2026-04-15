@@ -19,9 +19,6 @@ struct Foo1 {}
 enum Foo2 {}
 
 #cfg(target="xxx")
-typealias (Int, Int) as IntPair
-
-#cfg(target="xxx")
 trait Foo3 {}
 
 #cfg(target="xxx")

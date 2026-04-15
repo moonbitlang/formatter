@@ -4,7 +4,7 @@
   "deps": {
     "moonbitlang/x": "0.4.38",
     "Yoorkin/ArgParser": "0.2.0",
-    "moonbitlang/parser": "0.2.2",
+    "moonbitlang/parser": "0.2.5",
     "moonbitlang/yacc": "0.7.7",
     "Yoorkin/prettyprinter": "0.4.8"
   },

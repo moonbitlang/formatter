@@ -130,7 +130,7 @@ fn @syntax.Expr::classify(expr : Self) -> ExprKind {
     | DotApply(_) => SimpleKind
     Unary(_) => PrefixKind
     As(_) => PostfixKind("as")
-    Is(_) => PostfixKind("is")
+    Is(_) | IsLexMatch(_) => PostfixKind("is")
     Infix(op~, ..) =>
       match op.name {
         Ident(name~) => InfixKind(name)
@@ -138,6 +138,7 @@ fn @syntax.Expr::classify(expr : Self) -> ExprKind {
       }
     Pipe(_) => PipeKind
     Match(_)
+    | LexMatch(_)
     | If(_)
     | Loop(_)
     | For(_)
@@ -164,7 +165,6 @@ fn @syntax.Expr::classify(expr : Self) -> ExprKind {
     | Sequence(_)
     | LetMut(_)
     | StaticAssert(_) => StmtKind
-    IsLexMatch(_) | LexMatch(_) => ControlFlowAndArrowFnKind
   }
 }
 

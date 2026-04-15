@@ -43,7 +43,6 @@ fn attach_docstrings(
           // there is no docstring inside the types
           Abstract
           | Extern
-          | Newtype(_)
           | Alias(_)
           | Error(NoPayload | SinglePayload(_))
           | TupleStruct(_) => ()
@@ -65,14 +64,12 @@ fn attach_docstrings(
         }
       }
       TopFuncDef(fun_decl~, ..) => fun_decl.doc = doc
-      TopFuncAlias(..) as fa => fa.doc = doc
       TopLetDef(..) as ld => ld.doc = doc
       TopExpr(..) => ()
       TopImplRelation(..) as imp => imp.doc = doc
       TopTest(..) as test_ => test_.doc = doc
       TopTrait(decl) => decl.doc = doc
-      TopBatchTypeAlias(..) as decl => decl.doc = doc
-      TopBatchTraitAlias(..) as decl => decl.doc = doc
+      TopUsing(..) as decl => decl.doc = doc
       TopView(..) as view => view.doc = doc
       TopImpl(..) as imp => imp.doc = doc
       TopUsing(..) as u => u.doc = doc

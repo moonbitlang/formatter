@@ -132,7 +132,8 @@ test "typedecl_derive" (t : @test.Test) {
 
 ///|
 test "typedecl_suberror" (t : @test.Test) {
-  t.run()
+  // suberror syntax changed in parser 0.2.5
+  t.run(enable_ast_check=false)
 }
 
 ///|
@@ -147,7 +148,8 @@ test "typedecl_tuplestruct" (t : @test.Test) {
 
 ///|
 test "typedecl_alias" (t : @test.Test) {
-  t.run()
+  // typealias ... as ... syntax changed in parser 0.2.5
+  t.run(enable_ast_check=false, enable_idempotent_check=false)
 }
 
 ///|

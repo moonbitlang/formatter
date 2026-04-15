@@ -154,6 +154,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       vis~,
       attrs~,
       doc~,
+      loc~,
       ..
     ) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
@@ -205,6 +206,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
           }
           space + text("=") + stubs
         }
+        DeclNone => empty
       }
       doc +
       attrs +
@@ -220,7 +222,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       result +
       body
     }
-    TopTrait({ name, supers, methods, vis, attrs, doc, .. }) => {
+    TopTrait({ name, supers, methods, vis, attrs, doc, loc: _, .. }) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
@@ -332,6 +334,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
           let code = group(nest(line + fmt.embedded_code(code)))
           (extern_, equal + code)
         }
+        DeclNone => (empty, empty)
       }
       let layout = doc +
         attrs +
@@ -394,63 +397,31 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       let trait_ = space + fmt.type_name(trait_)
       doc + attrs + vis + impl_ + quantifiers + trait_ + for_ + self
     }
-    TopBatchTraitAlias(pkg~, targets~, vis~, attrs~, is_list=_, doc~, loc=_) => {
+    TopUsing(pkg~, names~, vis~, attrs~, doc~, loc=_) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
-      let traitalias_ = text("traitalias") + space
-      let pkg = match pkg {
-        None => empty
-        Some(label) => char('@') + fmt.label(label) + char('.')
+      let using_ = text("using") + space
+      let pkg = char('@') + fmt.label(pkg) + char('.')
+      let targets = match names {
+        More(x, tail=Empty) => {
+          let (target, _kind) = x
+          fmt.alias_target(target)
+        }
+        xs =>
+          group(
+            parens(
+              series1(
+                xs.map(x => {
+                  let (target, _kind) = x
+                  fmt.alias_target(target)
+                }),
+                comma,
+              ),
+            ),
+          )
       }
-      let targets = match targets {
-        More(x, tail=Empty) => fmt.alias_target(x)
-        xs => group(parens(series1(xs.map(x => fmt.alias_target(x)), comma)))
-      }
-      doc + attrs + vis + traitalias_ + pkg + targets
-    }
-    TopBatchTypeAlias(pkg~, targets~, vis~, attrs~, is_list=_, doc~, loc=_) => {
-      let doc = fmt.docstring(doc, is_toplevel=true)
-      let attrs = fmt.attributes(attrs)
-      let vis = fmt.visibility(vis)
-      let typealias_ = text("typealias") + space
-      let pkg = match pkg {
-        None => empty
-        Some(label) => char('@') + fmt.label(label) + char('.')
-      }
-      let targets = match targets {
-        More(x, tail=Empty) => fmt.alias_target(x)
-        xs => group(parens(series1(xs.map(x => fmt.alias_target(x)), comma)))
-      }
-      doc + attrs + vis + typealias_ + pkg + targets
-    }
-    TopFuncAlias(
-      pkg~,
-      type_name~,
-      targets~,
-      vis~,
-      attrs~,
-      is_list=_,
-      doc~,
-      loc=_
-    ) => {
-      let doc = fmt.docstring(doc, is_toplevel=true)
-      let attrs = fmt.attributes(attrs)
-      let vis = fmt.visibility(vis)
-      let fnalias_ = text("fnalias") + space
-      let type_name = match type_name {
-        None => empty
-        Some(label) => fmt.label(label) + text("::")
-      }
-      let pkg = match pkg {
-        None => empty
-        Some(label) => char('@') + fmt.label(label) + char('.')
-      }
-      let targets = match targets {
-        More(x, tail=Empty) => fmt.alias_target(x)
-        xs => group(parens(series1(xs.map(x => fmt.alias_target(x)), comma)))
-      }
-      doc + attrs + vis + fnalias_ + pkg + type_name + targets
+      doc + attrs + vis + using_ + pkg + targets
     }
   }
 }
@@ -848,7 +819,6 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
       doc + attrs + vis + type_ + ty + as_ + tycon
     }
     Extern => abort("Deprecated syntax `extern type` is not supported.")
-    Newtype(_) => abort("Deprecated syntax newtype is not supported.")
   }
 }
 
@@ -1186,9 +1156,11 @@ fn Fmt::pattern(fmt : Self, pat : @syntax.Pattern) -> Doc {
     }
     Or(pat1~, pat2~, loc=_) => {
       let sep = line + char('|') + space
-      let pats = loop (@list.from_array([pat1]), pat2) {
-        (acc, Or(pat1~, pat2~, loc=_)) => continue (acc.add(pat1), pat2)
-        (acc, pat) => acc.add(pat).rev()
+      let pats = for acc = @list.from_array([pat1]), cur = pat2 {
+        match cur {
+          Or(pat1~, pat2~, loc=_) => continue acc.add(pat1), pat2
+          pat => break acc.add(pat).rev()
+        }
       }
       let lparen = switch(empty, char('(') + space)
       let pats = separate(pats.map(x => fmt.pattern(x)), sep)
@@ -1597,10 +1569,12 @@ fn Fmt::case_block(
 ///   )
 /// ```
 fn Fmt::chained_dot_expr(fmt : Self, e : @syntax.Expr) -> RawExprDoc {
-  let xs = loop (@list.empty(), e) {
-    (acc, DotApply(self~, ..) as apply) => continue (acc.add(apply), self)
-    (acc, Field(record~, ..) as field) => continue (acc.add(field), record)
-    (acc, expr) => acc.add(expr)
+  let xs = for acc = @list.empty(), cur = e {
+    match cur {
+      DotApply(self~, ..) as apply => continue acc.add(apply), self
+      Field(record~, ..) as field => continue acc.add(field), record
+      expr => break acc.add(expr)
+    }
   }
   guard xs is More(s, tail=chained_exprs)
   let lhs = fmt.expr_before_dot(s)
@@ -1886,14 +1860,16 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       Normal(doc)
     }
     LetAnd(bindings~, body~, loc=_) => {
-      fn rec_binding2doc(triple) {
+      fn rec_binding2doc(
+        triple : (@syntax.Binder, @syntax.Type?, @syntax.Func),
+      ) {
         let (binder, ty, func) = triple
         let binder = fmt.binder(binder)
         let ty = match ty {
           None => empty
           Some(ty) => space + colon + space + fmt.ty(ty)
         }
-        let { parameters, body, .. } : @syntax.Func = func
+        let { parameters, body, .. } = func
         let params = space +
           group(
             fmt.parameters(
@@ -2231,9 +2207,9 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = group(braces(series(elems, comma, map_expr_elem2doc)))
       Normal(doc)
     }
-    Group(expr~, ..) => abort(expr.to_json().stringify(indent=2))
-    StaticAssert(_) => panic()
     IsLexMatch(_) => abort("lex match is not supported yet.")
     LexMatch(_) => abort("lex match is not supported yet.")
+    Group(expr~, ..) => abort(expr.to_json().stringify(indent=2))
+    StaticAssert(_) => panic()
   }
 }
