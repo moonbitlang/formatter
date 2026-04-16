@@ -218,4 +218,3 @@ test "lexmatch" (t : @test.Test) {
 test "async_toplevel" (t : @test.Test) {
   t.run(enable_ast_check=false)
 }
-

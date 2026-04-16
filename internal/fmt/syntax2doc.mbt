@@ -152,7 +152,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       vis~,
       loc=_,
       attrs~,
-      doc~,
+      doc~
     ) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
@@ -173,8 +173,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         space +
         char('{') +
         nest(
-          hardline +
-          series1(view_constrs.map(x => fmt.constr_decl(x)), semi),
+          hardline + series1(view_constrs.map(x => fmt.constr_decl(x)), semi),
         ) +
         hardline +
         char('}')
@@ -316,7 +315,17 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         )
       doc + attrs + declare_ + vis + trait_ + name + supers + methods
     }
-    TopLetDef(binder~, ty~, expr~, vis~, is_constant~, attrs~, doc~, is_declare~, ..) => {
+    TopLetDef(
+      binder~,
+      ty~,
+      expr~,
+      vis~,
+      is_constant~,
+      attrs~,
+      doc~,
+      is_declare~,
+      ..
+    ) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let declare_ = if is_declare { text("declare") + space } else { empty }
@@ -445,16 +454,21 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       doc + attrs + test_ + name + params + body
     }
     TopExpr(expr~, is_main~, local_types~, is_async~, ..) => {
-      let fn_ = if is_async is Some(_) {
-        text("async fn")
-      } else {
-        text("fn")
-      }
+      let fn_ = if is_async is Some(_) { text("async fn") } else { text("fn") }
       let name = space + text(if is_main { "main" } else { "init" })
       let expr = fmt.expr_block(expr, local_types~)
       fn_ + name + expr
     }
-    TopImplRelation(self_ty~, trait_~, quantifiers~, vis~, attrs~, doc~, is_declare~, ..) => {
+    TopImplRelation(
+      self_ty~,
+      trait_~,
+      quantifiers~,
+      vis~,
+      attrs~,
+      doc~,
+      is_declare~,
+      ..
+    ) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let declare_ = if is_declare { text("declare") + space } else { empty }
@@ -488,12 +502,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         kind_prefix + fmt.alias_target(target)
       }
 
-      let targets = space +
-        group(
-          braces(
-            series1(names.map(using_item), comma),
-          ),
-        )
+      let targets = space + group(braces(series1(names.map(using_item), comma)))
       doc + attrs + vis + using_ + pkg + targets
     }
   }
@@ -875,7 +884,8 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
               )
           }
           let constr_result = fmt.return_and_error_type_annotation(
-            decl.return_type, decl.error_type,
+            decl.return_type,
+            decl.error_type,
           )
           hardline +
           hardline +
@@ -892,9 +902,7 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
       let fields_doc = if fields.is_empty() && constr_decl is Some(_) {
         nest(constr)
       } else {
-        nest(
-          hardline + series1(fields.map(x => fmt.field_decl(x)), semi),
-        ) +
+        nest(hardline + series1(fields.map(x => fmt.field_decl(x)), semi)) +
         nest(constr)
       }
       let rbrace = hardline + char('}')
@@ -1621,8 +1629,7 @@ fn Fmt::lex_pattern(fmt : Self, pat : @syntax.LexPattern) -> Doc {
     }
     Alias(pat~, binder~, loc=_) =>
       fmt.lex_pattern(pat) + space + text("as") + space + fmt.binder(binder)
-    Sequence(pats~, loc=_) =>
-      separate(pats.map(p => fmt.lex_pattern(p)), space)
+    Sequence(pats~, loc=_) => separate(pats.map(p => fmt.lex_pattern(p)), space)
   }
 }
 
@@ -2280,7 +2287,16 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = label + loop_ + arg + body
       Normal(doc)
     }
-    For(binders~, condition~, continue_block~, body~, for_else~, where_clause~, label~, ..) => {
+    For(
+      binders~,
+      condition~,
+      continue_block~,
+      body~,
+      for_else~,
+      where_clause~,
+      label~,
+      ..
+    ) => {
       fn binder_expr2doc(pair : (@syntax.Binder, @syntax.Expr)) -> Doc {
         let (binder, expr) = pair
         let binder = fmt.binder(binder)
@@ -2336,9 +2352,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
           space +
           text("where") +
           space +
-          group(
-            braces(series1(fields.map(x => fmt.field(x)), comma)),
-          )
+          group(braces(series1(fields.map(x => fmt.field(x)), comma)))
       }
       let doc = label +
         for_ +
