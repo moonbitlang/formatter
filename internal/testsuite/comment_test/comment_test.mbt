@@ -6,6 +6,10 @@ fn @test.Test::run(t : Self) -> Unit raise {
   ) catch {
     _ => ""
   }
+  // Keep parser locations stable across LF and CRLF checkouts.
+  let source = source
+    .replace_all(old="\r\n", new="\n")
+    .replace_all(old="\r", new="\n")
   let (comments_info, formatted) = @fmt.debug_comment(source)
   t.write(formatted)
   t.writeln("==========================================================")
