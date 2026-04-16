@@ -139,8 +139,72 @@ fn Fmt::return_and_error_type_annotation(
 ///|
 fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
   match toplevel {
-    TopView(_) => abort("enumview is not supported yet.")
-    TopUsing(_) => abort("using is not supported yet.")
+    TopView(
+      quantifiers~,
+      source_ty~,
+      view_type_name~,
+      view_type_loc=_,
+      view_constrs~,
+      view_func_name~,
+      parameters~,
+      params_loc=_,
+      body~,
+      vis~,
+      loc=_,
+      attrs~,
+      doc~,
+    ) => {
+      let doc = fmt.docstring(doc, is_toplevel=true)
+      let attrs = fmt.attributes(attrs)
+      let vis = fmt.visibility(vis)
+      let enumview_ = text("enumview")
+      let quantifiers = fmt.type_var_binders(
+        quantifiers,
+        lbracket=None,
+        commas=@comment.NodeArray::empty(),
+        tvar_tables=@comment.NodeTableArray::empty(),
+        rbracket=None,
+      )
+      let view_name = space + text(view_type_name)
+      let semi = switch(char(';'), empty)
+      let constrs = if view_constrs.is_empty() {
+        space + text("{") + hardline + text("}")
+      } else {
+        space +
+        char('{') +
+        nest(
+          hardline +
+          series1(view_constrs.map(x => fmt.constr_decl(x)), semi),
+        ) +
+        hardline +
+        char('}')
+      }
+      let for_ = space + text("for") + space + fmt.ty(source_ty)
+      let with_ = space + text("with")
+      let func_name = space + fmt.binder(view_func_name)
+      let params = group(
+        fmt.parameters(
+          parameters,
+          lparen=None,
+          param_tables=@comment.NodeTableArray::empty(),
+          commas=@comment.NodeArray::empty(),
+          rparen=None,
+        ),
+      )
+      let body = space + fmt.expr_block(body, force_newline=true)
+      doc +
+      attrs +
+      vis +
+      enumview_ +
+      quantifiers +
+      view_name +
+      constrs +
+      for_ +
+      with_ +
+      func_name +
+      params +
+      body
+    }
     TopImpl(
       self_ty~,
       trait_~,
@@ -222,9 +286,10 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       result +
       body
     }
-    TopTrait({ name, supers, methods, vis, attrs, doc, loc: _, .. }) => {
+    TopTrait({ name, supers, methods, vis, attrs, doc, loc: _, is_declare, .. }) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
+      let declare_ = if is_declare { text("declare") + space } else { empty }
       let vis = fmt.visibility(vis)
       let trait_ = text("trait")
       let name = space + fmt.binder(name)
@@ -249,11 +314,12 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
           series1(methods.map(x => fmt.trait_method(x)), empty),
           force_newline=true,
         )
-      doc + attrs + vis + trait_ + name + supers + methods
+      doc + attrs + declare_ + vis + trait_ + name + supers + methods
     }
-    TopLetDef(binder~, ty~, expr~, vis~, is_constant~, attrs~, doc~, ..) => {
+    TopLetDef(binder~, ty~, expr~, vis~, is_constant~, attrs~, doc~, is_declare~, ..) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
+      let declare_ = if is_declare { text("declare") + space } else { empty }
       let vis = fmt.visibility(vis)
       let let_ = text(if is_constant { "const" } else { "let" })
       let binder = space + fmt.binder(binder)
@@ -262,7 +328,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         Some(ty) => space + colon + fmt.ty(ty)
       }
       let rhs = space + char('=') + fmt.compose(expr, Expr) // TODO: compose_rhs
-      doc + attrs + vis + let_ + binder + ty + rhs
+      doc + attrs + declare_ + vis + let_ + binder + ty + rhs
     }
     TopTypeDef(typedecl) => fmt.typedecl(typedecl)
     TopFuncDef(fun_decl~, decl_body~, loc~) => {
@@ -286,7 +352,7 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       let vis = fmt.visibility(vis)
       let fn_ = fmt.wrap_comment(table.get_token("fn"), text("fn"))
       let async_ = if is_async is Some(_) {
-        fmt.wrap_comment(table.get_token("async"), space + text("async"))
+        fmt.wrap_comment(table.get_token("async"), text("async") + space)
       } else {
         empty
       }
@@ -349,10 +415,14 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
         body
       fmt.wrap_comment(Some(Node(loc)), layout)
     }
-    TopTest(expr~, name~, params~, local_types~, attrs~, doc~, ..) => {
+    TopTest(expr~, name~, params~, local_types~, attrs~, doc~, is_async~, ..) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
-      let test_ = text("test")
+      let test_ = if is_async is Some(_) {
+        text("async test")
+      } else {
+        text("test")
+      }
       let name = match name {
         None => empty
         Some((s, _)) => space + double_quoted(text(s))
@@ -371,18 +441,23 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
             ),
           )
       }
-      let body = fmt.expr_block(expr, local_types~)
+      let body = space + fmt.expr_block(expr, local_types~)
       doc + attrs + test_ + name + params + body
     }
-    TopExpr(expr~, is_main~, local_types~, ..) => {
-      let fn_ = text("fn")
+    TopExpr(expr~, is_main~, local_types~, is_async~, ..) => {
+      let fn_ = if is_async is Some(_) {
+        text("async fn")
+      } else {
+        text("fn")
+      }
       let name = space + text(if is_main { "main" } else { "init" })
       let expr = fmt.expr_block(expr, local_types~)
       fn_ + name + expr
     }
-    TopImplRelation(self_ty~, trait_~, quantifiers~, vis~, attrs~, doc~, ..) => {
+    TopImplRelation(self_ty~, trait_~, quantifiers~, vis~, attrs~, doc~, is_declare~, ..) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
+      let declare_ = if is_declare { text("declare") + space } else { empty }
       let vis = fmt.visibility(vis)
       let impl_ = text("impl")
       let quantifiers = fmt.type_var_binders(
@@ -395,32 +470,30 @@ fn Fmt::impl_(fmt : Self, toplevel : @syntax.Impl) -> Doc {
       let self = space + fmt.ty(self_ty)
       let for_ = space + text("for")
       let trait_ = space + fmt.type_name(trait_)
-      doc + attrs + vis + impl_ + quantifiers + trait_ + for_ + self
+      doc + attrs + declare_ + vis + impl_ + quantifiers + trait_ + for_ + self
     }
     TopUsing(pkg~, names~, vis~, attrs~, doc~, loc=_) => {
       let doc = fmt.docstring(doc, is_toplevel=true)
       let attrs = fmt.attributes(attrs)
       let vis = fmt.visibility(vis)
       let using_ = text("using") + space
-      let pkg = char('@') + fmt.label(pkg) + char('.')
-      let targets = match names {
-        More(x, tail=Empty) => {
-          let (target, _kind) = x
-          fmt.alias_target(target)
+      let pkg = char('@') + fmt.label(pkg)
+      fn using_item(item : (@syntax.AliasTarget, @syntax.UsingKind)) -> Doc {
+        let (target, kind) = item
+        let kind_prefix = match kind {
+          Value => empty
+          Type => text("type") + space
+          Trait => text("trait") + space
         }
-        xs =>
-          group(
-            parens(
-              series1(
-                xs.map(x => {
-                  let (target, _kind) = x
-                  fmt.alias_target(target)
-                }),
-                comma,
-              ),
-            ),
-          )
+        kind_prefix + fmt.alias_target(target)
       }
+
+      let targets = space +
+        group(
+          braces(
+            series1(names.map(using_item), comma),
+          ),
+        )
       doc + attrs + vis + using_ + pkg + targets
     }
   }
@@ -733,10 +806,11 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
     type_vis,
     deriving,
     loc: _,
-    is_declare: _,
+    is_declare,
   } = typedecl
   let doc = fmt.docstring(doc, is_toplevel=true)
   let attrs = fmt.attributes(attrs)
+  let declare_ = if is_declare { text("declare") + space } else { empty }
   let vis = fmt.visibility(type_vis)
   let semi = switch(char(';'), empty)
   match components {
@@ -752,6 +826,7 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
       let deriving = fmt.deriving_directives(deriving)
       doc +
       attrs +
+      declare_ +
       vis +
       enum_ +
       tycon +
@@ -761,25 +836,78 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
       rbrace +
       deriving
     }
-    Record(fields~, ..) => {
+    Record(fields~, constr_decl~) => {
       let struct_ = text("struct")
       let tycon = space + text(tycon)
       let params = fmt.type_decl_binders(params)
       let lbrace = space + char('{')
       let semi = switch(char(';'), empty)
-      let fields = nest(
-        hardline + series1(fields.map(x => fmt.field_decl(x)), semi),
-      )
+      let constr = match constr_decl {
+        None => empty
+        Some(decl) => {
+          let constr_doc = fmt.docstring(decl.doc, is_toplevel=false)
+          let constr_attrs = fmt.attributes(decl.attrs)
+          let constr_async = if decl.is_async is Some(_) {
+            text("async") + space
+          } else {
+            empty
+          }
+          let fn_ = text("fn")
+          let constr_quantifiers = fmt.type_var_binders(
+            decl.quantifiers,
+            lbracket=None,
+            commas=@comment.NodeArray::empty(),
+            tvar_tables=@comment.NodeTableArray::empty(),
+            rbracket=None,
+          )
+          let constr_name = space + fmt.binder(decl.name)
+          let constr_params = match decl.decl_params {
+            None => empty
+            Some(xs) =>
+              group(
+                fmt.parameters(
+                  xs,
+                  lparen=None,
+                  param_tables=@comment.NodeTableArray::empty(),
+                  commas=@comment.NodeArray::empty(),
+                  rparen=None,
+                ),
+              )
+          }
+          let constr_result = fmt.return_and_error_type_annotation(
+            decl.return_type, decl.error_type,
+          )
+          hardline +
+          hardline +
+          constr_doc +
+          constr_attrs +
+          constr_async +
+          fn_ +
+          constr_quantifiers +
+          constr_name +
+          constr_params +
+          constr_result
+        }
+      }
+      let fields_doc = if fields.is_empty() && constr_decl is Some(_) {
+        nest(constr)
+      } else {
+        nest(
+          hardline + series1(fields.map(x => fmt.field_decl(x)), semi),
+        ) +
+        nest(constr)
+      }
       let rbrace = hardline + char('}')
       let deriving = fmt.deriving_directives(deriving)
       doc +
       attrs +
+      declare_ +
       vis +
       struct_ +
       tycon +
       params +
       lbrace +
-      fields +
+      fields_doc +
       rbrace +
       deriving
     }
@@ -797,26 +925,26 @@ fn Fmt::typedecl(fmt : Fmt, typedecl : @syntax.TypeDecl) -> Doc {
             force_newline=true,
           )
       }
-      doc + attrs + vis + struct_ + tycon + payload
+      doc + attrs + declare_ + vis + struct_ + tycon + payload
     }
     Abstract => {
       let type_ = text("type")
       let tycon = space + text(tycon)
-      doc + attrs + vis + type_ + tycon
+      doc + attrs + declare_ + vis + type_ + tycon
     }
     TupleStruct(tys) => {
       let type_ = text("struct")
       let tycon = space + text(tycon)
       let tys = group(parens(series1(tys.map(x => fmt.ty(x)), comma)))
       let params = fmt.type_decl_binders(params)
-      doc + attrs + vis + type_ + tycon + params + tys
+      doc + attrs + declare_ + vis + type_ + tycon + params + tys
     }
     Alias(ty) => {
       let type_ = text("typealias")
       let ty = space + fmt.ty(ty)
       let as_ = space + text("as")
       let tycon = space + text(tycon)
-      doc + attrs + vis + type_ + ty + as_ + tycon
+      doc + attrs + declare_ + vis + type_ + ty + as_ + tycon
     }
     Extern => abort("Deprecated syntax `extern type` is not supported.")
   }
@@ -1477,6 +1605,65 @@ fn Fmt::loop_label(
 }
 
 ///|
+fn Fmt::lex_pattern(fmt : Self, pat : @syntax.LexPattern) -> Doc {
+  match pat {
+    Regex(lit~, loc=_) => double_quoted(text(lit))
+    RegexInterp(elems~, loc=_) => {
+      fn elem2doc(elem : @syntax.InterpElem) -> Doc {
+        match elem {
+          Literal(repr~, loc=_) => text(repr)
+          Expr(expr~, loc=_) => fmt.compose(expr, Expr)
+          Source({ source, loc: _ }) => text(source)
+        }
+      }
+
+      double_quoted(concat_map(elems, elem2doc))
+    }
+    Alias(pat~, binder~, loc=_) =>
+      fmt.lex_pattern(pat) + space + text("as") + space + fmt.binder(binder)
+    Sequence(pats~, loc=_) =>
+      separate(pats.map(p => fmt.lex_pattern(p)), space)
+  }
+}
+
+///|
+fn Fmt::lex_top_pattern(fmt : Self, pat : @syntax.LexTopPattern) -> Doc {
+  match pat {
+    Pattern(p) => fmt.lex_pattern(p)
+    Binder(b) => fmt.binder(b)
+    Wildcard(loc=_) => text("_")
+  }
+}
+
+///|
+fn Fmt::lex_top_patterns(fmt : Self, pats : List[@syntax.LexTopPattern]) -> Doc {
+  match pats {
+    More(x, tail=Empty) => fmt.lex_top_pattern(x)
+    _ => group(parens(series1(pats.map(p => fmt.lex_top_pattern(p)), comma)))
+  }
+}
+
+///|
+fn Fmt::lex_case(fmt : Self, case_ : @syntax.LexCase) -> Doc {
+  let { pat, pat_loc: _, guard_, body } = case_
+  let pattern = fmt.lex_top_patterns(pat)
+  let guard_ = match guard_ {
+    None => empty
+    Some(expr) => space + text("if") + space + fmt.compose(expr, Infix(Other))
+  }
+  let body = space + text("=>") + fmt.compose_case_rhs(body, ExprStmt)
+  group(group(pattern) + guard_ + body)
+}
+
+///|
+fn Fmt::lex_strategy(fmt : Self, strategy : @syntax.Label?) -> Doc {
+  match strategy {
+    None => empty
+    Some(label) => space + text("with") + space + fmt.label(label)
+  }
+}
+
+///|
 fn Fmt::case(fmt : Self, case_ : @syntax.Case) -> Doc {
   let { pattern, guard_, body } = case_
   let pattern = fmt.pattern(pattern)
@@ -2093,7 +2280,7 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = label + loop_ + arg + body
       Normal(doc)
     }
-    For(binders~, condition~, continue_block~, body~, for_else~, label~, ..) => {
+    For(binders~, condition~, continue_block~, body~, for_else~, where_clause~, label~, ..) => {
       fn binder_expr2doc(pair : (@syntax.Binder, @syntax.Expr)) -> Doc {
         let (binder, expr) = pair
         let binder = fmt.binder(binder)
@@ -2143,7 +2330,22 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
           semi_or_newline +
           continue_block.unwrap_or(empty)
       }
-      let doc = label + for_ + group(nest(softline + header)) + body + for_else
+      let where_ = match where_clause {
+        None => empty
+        Some({ fields, loc: _ }) =>
+          space +
+          text("where") +
+          space +
+          group(
+            braces(series1(fields.map(x => fmt.field(x)), comma)),
+          )
+      }
+      let doc = label +
+        for_ +
+        group(nest(softline + header)) +
+        body +
+        for_else +
+        where_
       Normal(doc)
     }
     ForEach(binders~, expr~, body~, else_block~, label~, loc=_) => {
@@ -2207,8 +2409,27 @@ fn Fmt::expr(fmt : Self, expr : @syntax.Expr) -> RawExprDoc {
       let doc = group(braces(series(elems, comma, map_expr_elem2doc)))
       Normal(doc)
     }
-    IsLexMatch(_) => abort("lex match is not supported yet.")
-    LexMatch(_) => abort("lex match is not supported yet.")
+    IsLexMatch(expr~, strategy~, pat~, pat_loc=_, loc=_) => {
+      let expr = fmt.compose(expr, Expr)
+      let lexmatch_ = space + text("lexmatch?")
+      let pat = space + fmt.lex_top_patterns(pat)
+      let strategy = fmt.lex_strategy(strategy)
+      let doc = group(expr + lexmatch_ + pat + strategy)
+      Normal(doc)
+    }
+    LexMatch(strategy~, expr~, match_loc=_, cases~, loc=_) => {
+      let lexmatch_ = text("lexmatch")
+      let cond = space + fmt.compose(expr, Infix(Other))
+      let strategy = fmt.lex_strategy(strategy)
+      let cases = space +
+        group(
+          braces(
+            series1(cases.map(x => fmt.lex_case(x)), empty),
+            force_newline=true,
+          ),
+        )
+      Collapsible(lexmatch_ + cond + strategy, cases)
+    }
     Group(expr~, ..) => abort(expr.to_json().stringify(indent=2))
     StaticAssert(_) => panic()
   }

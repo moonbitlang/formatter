@@ -188,3 +188,34 @@ test "docstring" (t : @test.Test) {
 test "constant_literals" (t : @test.Test) {
   t.run()
 }
+
+///|
+test "using_decl" (t : @test.Test) {
+  t.run(enable_ast_check=false)
+}
+
+///|
+test "for_where" (t : @test.Test) {
+  t.run(enable_ast_check=false)
+}
+
+///|
+test "struct_constructor" (t : @test.Test) {
+  t.run(enable_ast_check=false)
+}
+
+///|
+test "declare_keyword" (t : @test.Test) {
+  t.run(enable_ast_check=false)
+}
+
+///|
+test "lexmatch" (t : @test.Test) {
+  t.run(enable_ast_check=false)
+}
+
+///|
+test "async_toplevel" (t : @test.Test) {
+  t.run(enable_ast_check=false)
+}
+

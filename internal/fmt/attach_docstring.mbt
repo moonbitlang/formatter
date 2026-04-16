@@ -72,7 +72,6 @@ fn attach_docstrings(
       TopUsing(..) as decl => decl.doc = doc
       TopView(..) as view => view.doc = doc
       TopImpl(..) as imp => imp.doc = doc
-      TopUsing(..) as u => u.doc = doc
     }
     skip_docstrings_before(toplevel.loc().end) |> ignore
   }
