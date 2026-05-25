@@ -8,7 +8,8 @@ created with the following goals in mind:
 - Guarantee idempotence: formatting the code multiple times yields the same result after the first application.
 - Properly handle comments and merge blank lines.
 
-**Warning: This module is highly experimental and work in progress.**
+**Deprecated:** This module is deprecated. Please use the `fmt` package from
+[`moonbitlang/parser`](https://mooncakes.io/docs/moonbitlang/parser) instead.
 
 ## Status
 
